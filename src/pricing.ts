@@ -1,6 +1,7 @@
 import type { ModePricing } from "./types.js";
+import { DEFAULT_MIN_SAVINGS_THRESHOLD } from "./threshold.js";
 
-export const DEFAULT_SAVINGS_THRESHOLD = 2_000;
+export const DEFAULT_SAVINGS_THRESHOLD = DEFAULT_MIN_SAVINGS_THRESHOLD;
 
 function sum(amounts: readonly number[]): number {
   return amounts.reduce((total, amount) => total + amount, 0);

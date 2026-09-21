@@ -47,10 +47,16 @@ export interface DualModeNetSpendInput {
 
 export interface DualModeNetSpendResult {
   showNudge: boolean;
-  /** CEPAAAT net spend − MURAAAH net spend. Exact payable delta. */
+  /** CEPAAAT net spend − MURAAAH net spend. Exact payable delta (GOTO-S2 `delta_rp`). */
   savingsAmount: number;
+  /** Same integer as savingsAmount; S2 name `delta_rp`. */
+  deltaRp: number;
   fastNetSpend: number;
   cheapNetSpend: number;
+  /** True when deltaRp ≥ configured threshold (availability is separate). */
+  meetsThreshold: boolean;
+  /** Whether MURAAAH is in the candidate set for this session. */
+  murahInCandidateSet: boolean;
   reason: HiddenReason | null;
 }
 

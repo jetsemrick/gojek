@@ -22,7 +22,16 @@ export function dualModeNetSpend(
   const cheapNetSpend = computeNetSpend(input.cheap);
   const savingsAmount = fastNetSpend - cheapNetSpend;
   const threshold = input.threshold ?? DEFAULT_SAVINGS_THRESHOLD;
-  const amounts = { savingsAmount, fastNetSpend, cheapNetSpend };
+  const meetsThreshold = savingsAmount >= threshold;
+  const murahInCandidateSet = input.murahAvailable;
+  const amounts = {
+    savingsAmount,
+    deltaRp: savingsAmount,
+    fastNetSpend,
+    cheapNetSpend,
+    meetsThreshold,
+    murahInCandidateSet,
+  };
 
   if (!input.featureFlagEnabled) {
     return hidden({ ...amounts, reason: "flag_off" });

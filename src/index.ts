@@ -1,9 +1,14 @@
 export { computeNetSpend, DEFAULT_SAVINGS_THRESHOLD } from "./pricing.js";
 export { dualModeNetSpend } from "./dualModeNetSpend.js";
 export {
-  isSavingsNudgeEnabled,
-  SAVINGS_NUDGE_FLAG_KEY,
+  isCheapSavingsNudgeEnabled,
+  CHEAP_SAVINGS_NUDGE_FLAG,
 } from "./featureFlag.js";
+export {
+  getMinSavingsThreshold,
+  MIN_SAVINGS_THRESHOLD_KEY,
+  DEFAULT_MIN_SAVINGS_THRESHOLD,
+} from "./threshold.js";
 export {
   formatRp,
   saveWithMuraaah,

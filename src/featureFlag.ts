@@ -1,14 +1,20 @@
 /**
- * Experiment flag stub. Control = off.
+ * Feature-flag stub for the Cheap savings nudge surface (GOTO-S3).
  *
- * In this spike the flag is a simple env/config bit, not a production
- * experiment platform. The calculator takes the resolved boolean so tests
- * can drive it without mutating process.env.
+ * Experiment design is 50/50 control (off) vs treatment (on). This spike
+ * does not bucket traffic — it only gates the surface. Control default = off.
+ *
+ * Swap-ready: resolve this boolean from env/config today; replace the
+ * body of `isCheapSavingsNudgeEnabled` with the real experiment SDK later
+ * without renaming call sites.
+ *
+ * Threshold is a *separate* hook (`min_savings_threshold` in threshold.ts).
  */
-export const SAVINGS_NUDGE_FLAG_KEY = "SAVINGS_NUDGE_ENABLED";
+export const CHEAP_SAVINGS_NUDGE_FLAG = "cheap_savings_nudge_enabled";
 
 export interface FeatureFlagConfig {
-  [SAVINGS_NUDGE_FLAG_KEY]?: string;
+  [CHEAP_SAVINGS_NUDGE_FLAG]?: boolean | string;
+  CHEAP_SAVINGS_NUDGE_ENABLED?: string;
 }
 
 function truthy(value: string | undefined): boolean {
@@ -20,8 +26,19 @@ function truthy(value: string | undefined): boolean {
 }
 
 /** Control group default: surface is off unless explicitly enabled. */
-export function isSavingsNudgeEnabled(
-  env: FeatureFlagConfig = process.env,
+export function isCheapSavingsNudgeEnabled(
+  config: FeatureFlagConfig = process.env,
 ): boolean {
-  return truthy(env[SAVINGS_NUDGE_FLAG_KEY]);
+  const named = config[CHEAP_SAVINGS_NUDGE_FLAG];
+  if (typeof named === "boolean") {
+    return named;
+  }
+  if (typeof named === "string") {
+    return truthy(named);
+  }
+  return truthy(config.CHEAP_SAVINGS_NUDGE_ENABLED);
 }
+
+/** @deprecated Use isCheapSavingsNudgeEnabled */
+export const isSavingsNudgeEnabled = isCheapSavingsNudgeEnabled;
+export const SAVINGS_NUDGE_FLAG_KEY = CHEAP_SAVINGS_NUDGE_FLAG;

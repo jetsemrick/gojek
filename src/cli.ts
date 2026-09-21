@@ -21,7 +21,7 @@ import {
   supplyDrop,
   tapNudge,
 } from "./checkoutSession.js";
-import { isSavingsNudgeEnabled } from "./featureFlag.js";
+import { isCheapSavingsNudgeEnabled } from "./featureFlag.js";
 import {
   demoComparison,
   demoTelemetry,
@@ -45,7 +45,7 @@ function argValue(name: string): string | undefined {
 }
 
 function buildInput(): DualModeNetSpendInput {
-  const envFlag = isSavingsNudgeEnabled();
+  const envFlag = isCheapSavingsNudgeEnabled();
   const featureFlagEnabled = hasFlag("--flag-off")
     ? false
     : hasFlag("--flag-on")

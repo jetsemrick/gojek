@@ -7,7 +7,7 @@ import {
   prdFastPricing,
   stackedCheapPricing,
 } from "./fixtures.js";
-import { computeNetSpend, DEFAULT_SAVINGS_THRESHOLD } from "./pricing.js";
+import { computeNetSpend } from "./pricing.js";
 
 describe("computeNetSpend", () => {
   it("matches the PRD Fast payable total (cart + delivery after discounts)", () => {
@@ -32,6 +32,9 @@ describe("dualModeNetSpend", () => {
     expect(result.fastNetSpend).toBe(85_000);
     expect(result.cheapNetSpend).toBe(81_500);
     expect(result.savingsAmount).toBe(3_500);
+    expect(result.deltaRp).toBe(3_500);
+    expect(result.meetsThreshold).toBe(true);
+    expect(result.murahInCandidateSet).toBe(true);
     expect(result.showNudge).toBe(true);
     expect(result.reason).toBeNull();
   });
@@ -49,7 +52,8 @@ describe("dualModeNetSpend", () => {
     );
 
     expect(result.savingsAmount).toBe(900);
-    expect(result.savingsAmount).toBeLessThan(DEFAULT_SAVINGS_THRESHOLD);
+    expect(result.deltaRp).toBe(900);
+    expect(result.meetsThreshold).toBe(false);
     expect(result.showNudge).toBe(false);
     expect(result.reason).toBe("below_threshold");
   });
@@ -60,6 +64,8 @@ describe("dualModeNetSpend", () => {
     );
 
     expect(result.savingsAmount).toBe(3_500);
+    expect(result.meetsThreshold).toBe(true);
+    expect(result.murahInCandidateSet).toBe(false);
     expect(result.showNudge).toBe(false);
     expect(result.reason).toBe("unavailable");
   });
@@ -110,6 +116,8 @@ describe("dualModeNetSpend", () => {
     expect(result.fastNetSpend).toBe(85_000);
     expect(result.cheapNetSpend).toBe(83_000);
     expect(result.savingsAmount).toBe(2_000);
+    expect(result.deltaRp).toBe(2_000);
+    expect(result.meetsThreshold).toBe(true);
     expect(result.showNudge).toBe(true);
     expect(result.reason).toBeNull();
   });
@@ -127,6 +135,7 @@ describe("dualModeNetSpend", () => {
     );
 
     expect(result.savingsAmount).toBe(1_999);
+    expect(result.meetsThreshold).toBe(false);
     expect(result.showNudge).toBe(false);
     expect(result.reason).toBe("below_threshold");
   });
