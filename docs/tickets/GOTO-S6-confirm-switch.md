@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | **ID** | GOTO-S6 |
-| **Status** | Todo |
+| **Status** | In Progress |
 | **Milestone** | M1c |
 | **Priority** | P1 |
 | **Spike** | M1 Path A — mocks |
@@ -24,15 +24,15 @@ Cancel/dismiss remain GOTO-S5 / AC-007.
 
 ## Acceptance criteria
 
-- [ ] **AC-006 / REQ-006:** Given the bottom sheet is open, when the user taps **`Yes, change`**:
-  - [ ] Delivery mode switches to **MURAAAH**.
-  - [ ] Net spend and candidate promos **recalculate** for MURAAAH (GOTO-S2); Payment Summary payable total updates to the Cheap net.
-  - [ ] **Gojek PLUS checkout nudge is hidden** (US-006: Cheap and PLUS must not compete on the same screen).
-  - [ ] The Cheap savings nudge copy updates to **`Yay! You saved Rp{X}`** (same `{X}` as the pre-switch delta unless recalc produces a documented equal value).
-  - [ ] **Scroll position is unchanged** (no auto-scroll to the mode selector or top of checkout).
-- [ ] Sheet closes after confirm.
-- [ ] A second tap on the post-switch success row does **not** re-open a Fast→Cheap switcher (user is already on MURAAAH).
-- [ ] Path A may stub the PLUS nudge as a mock sibling component that becomes hidden; no real subscription flow.
+- [x] **AC-006 / REQ-006:** Given the bottom sheet is open, when the user taps **`Yes, change`**:
+  - [x] Delivery mode switches to **MURAAAH**.
+  - [x] Net spend and candidate promos **recalculate** for MURAAAH (GOTO-S2); Payment Summary payable total updates to the Cheap net.
+  - [x] **Gojek PLUS checkout nudge is hidden** (US-006: Cheap and PLUS must not compete on the same screen).
+  - [x] The Cheap savings nudge copy updates to **`Yay! You saved Rp{X}`** (same `{X}` as the pre-switch delta unless recalc produces a documented equal value).
+  - [x] **Scroll position is unchanged** (no auto-scroll to the mode selector or top of checkout).
+- [x] Sheet closes after confirm.
+- [x] A second tap on the post-switch success row does **not** re-open a Fast→Cheap switcher (user is already on MURAAAH).
+- [x] Path A may stub the PLUS nudge as a mock sibling component that becomes hidden; no real subscription flow.
 
 ## Out of scope for this ticket
 
@@ -55,3 +55,4 @@ Cancel/dismiss remain GOTO-S5 / AC-007.
 - Mocks OK for PLUS nudge visibility and promo recalc.
 - Threshold default Rp2,000 with config hook (already satisfied to reach this screen).
 - English PRD copy template: `Yay! You saved Rp{X}`.
+- **Partial (this PR):** thin web happy path only so the demo loop stays clickable (`confirmSwitch` → MURAAAH, Cheap payable, hide PLUS mock, success copy). Host-app scroll-offset lock, S7 supply-drop, and S8 `confirm_switch` telemetry sink are still out. Status stays **In Progress**.

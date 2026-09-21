@@ -4,7 +4,7 @@ import type { DualModeNetSpendInput, SavingsNudgeView } from "./types.js";
 
 /**
  * UI-surface view-model: pricing decision plus PRD string templates.
- * No native/React UI — this is what a checkout screen would bind to.
+ * The React checkout mock in `web/` binds to this; no production GoFood UI.
  */
 export function evaluateSavingsNudge(
   input: DualModeNetSpendInput,
