@@ -2,21 +2,35 @@
   "name": "goto-savings-nudges-m1",
   "version": "0.1.0",
   "private": true,
-  "description": "Path A spike: GoTo Savings Nudges M1 pricing contract and UI-surface stubs (mocks, not production GoFood).",
+  "description": "Path A spike: GoTo Savings Nudges M1 pricing contract plus a React/Vite checkout mock (not production GoFood).",
   "type": "module",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
+    "dev": "vite",
+    "preview": "vite preview",
     "build": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "demo": "tsx src/cli.ts"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/node": "^24.5.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "jsdom": "^29.1.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
+    "vite": "^7.3.6",
     "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   }
 }

@@ -20,11 +20,10 @@ import type {
 } from "./types.js";
 
 /**
- * Pure-logic stub of the checkout UI surface (AC-004–007, AC-009–010).
+ * Pure-logic checkout UI-surface state machine (AC-004–007, AC-009–010).
  *
- * This is not a real bottom-sheet framework, React Native, or GoFood
- * checkout. It models the session so the pricing contract can be demoed
- * and the later UI PR has a state machine to bind to.
+ * The React mock in `web/` binds to these transitions. This is not a
+ * production GoFood checkout or native bottom-sheet framework.
  */
 
 export interface ModeComparison {

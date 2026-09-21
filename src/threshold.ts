@@ -11,8 +11,12 @@ export interface ThresholdConfig {
   MIN_SAVINGS_THRESHOLD?: string | number;
 }
 
+function hostEnv(): ThresholdConfig {
+  return typeof process !== "undefined" && process.env ? process.env : {};
+}
+
 export function getMinSavingsThreshold(
-  config: ThresholdConfig = process.env,
+  config: ThresholdConfig = hostEnv(),
 ): number {
   const raw =
     config[MIN_SAVINGS_THRESHOLD_KEY] ?? config.MIN_SAVINGS_THRESHOLD;

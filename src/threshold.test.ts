@@ -9,6 +9,7 @@ describe("getMinSavingsThreshold", () => {
   it("defaults to Rp2,000", () => {
     expect(getMinSavingsThreshold({})).toBe(2_000);
     expect(DEFAULT_MIN_SAVINGS_THRESHOLD).toBe(2_000);
+    expect(() => getMinSavingsThreshold()).not.toThrow();
   });
 
   it("reads the named config hook", () => {
