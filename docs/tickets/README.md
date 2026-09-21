@@ -23,16 +23,16 @@ Engineer alignment: README/spec, dual-mode net-spend module, and the feature-fla
 | In progress | Implementation PR in flight |
 | Done | Merged / verified |
 
-All tickets below start as **Todo**.
+Statuses live in the index and each ticket file.
 
 ## Index
 
 | ID | Ticket | Milestone | Priority | Status | Maps |
 | --- | --- | --- | --- | --- | --- |
 | [GOTO-S0](./GOTO-S0-contract-lock.md) | M0 contract lock (formula, threshold, copy, telemetry schema) | M0 | P0 | Todo | Contract for US-001–006 / REQ-001–012 / AC-001–012 |
-| [GOTO-S1](./GOTO-S1-readme-spec.md) | README/spec in repo | M1a | P0 | Todo | M1 scope + AC checklist (all ACs documented) |
-| [GOTO-S2](./GOTO-S2-net-spend-module.md) | Dual-mode net-spend module + fixture-cart tests | M1a | P0 | Todo | US-001/003, REQ-002/011, AC-002/011 |
-| [GOTO-S3](./GOTO-S3-feature-flag-stub.md) | Feature-flag stub for the nudge surface | M1a | P0 | Todo | Experiment gate (REQ-001 / AC-001 when flag off) |
+| [GOTO-S1](./GOTO-S1-readme-spec.md) | README/spec in repo | M1a | P0 | Done | M1 scope + AC checklist (all ACs documented) |
+| [GOTO-S2](./GOTO-S2-net-spend-module.md) | Dual-mode net-spend module + fixture-cart tests | M1a | P0 | Done | US-001/003, REQ-002/011, AC-002/011 |
+| [GOTO-S3](./GOTO-S3-feature-flag-stub.md) | Feature-flag stub for the nudge surface | M1a | P0 | Done | Experiment gate (REQ-001 / AC-001 when flag off) |
 | [GOTO-S4](./GOTO-S4-nudge-ui.md) | Nudge UI below Payment Summary (show/hide) | M1b | P1 | Todo | US-001/005, REQ-001/003/007/008, AC-001/003/008 |
 | [GOTO-S5](./GOTO-S5-bottom-sheet-switcher.md) | Bottom sheet switcher | M1b | P1 | Todo | US-002/004, REQ-004/005, AC-004/005/007 |
 | [GOTO-S6](./GOTO-S6-confirm-switch.md) | Confirm switch (recalc, hide PLUS, success copy, scroll) | M1c | P1 | Todo | US-002/003/006, REQ-006, AC-006 |
@@ -44,7 +44,7 @@ All tickets below start as **Todo**.
 
 ```text
 M0   GOTO-S0
-M1a  GOTO-S1  GOTO-S2  GOTO-S3     (docs + calc + flag — in flight alongside this backlog)
+M1a  GOTO-S1  GOTO-S2  GOTO-S3     (docs + calc + flag — Done after spike PR #2)
 M1b  GOTO-S4 → GOTO-S5
 M1c  GOTO-S6 → GOTO-S7
 M1d  GOTO-S8  GOTO-S9
