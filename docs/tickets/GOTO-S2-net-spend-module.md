@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | **ID** | GOTO-S2 |
-| **Status** | Todo |
+| **Status** | Done |
 | **Milestone** | M1a |
 | **Priority** | P0 |
 | **Spike** | M1 Path A — mocks |
