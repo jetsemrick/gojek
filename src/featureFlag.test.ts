@@ -7,6 +7,7 @@ import {
 describe("isCheapSavingsNudgeEnabled", () => {
   it("defaults to off (experiment control)", () => {
     expect(isCheapSavingsNudgeEnabled({})).toBe(false);
+    expect(() => isCheapSavingsNudgeEnabled()).not.toThrow();
   });
 
   it("treats true / 1 / on as enabled", () => {

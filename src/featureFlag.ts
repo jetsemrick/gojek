@@ -25,9 +25,13 @@ function truthy(value: string | undefined): boolean {
   return normalized === "true" || normalized === "1" || normalized === "on";
 }
 
+function hostEnv(): FeatureFlagConfig {
+  return typeof process !== "undefined" && process.env ? process.env : {};
+}
+
 /** Control group default: surface is off unless explicitly enabled. */
 export function isCheapSavingsNudgeEnabled(
-  config: FeatureFlagConfig = process.env,
+  config: FeatureFlagConfig = hostEnv(),
 ): boolean {
   const named = config[CHEAP_SAVINGS_NUDGE_FLAG];
   if (typeof named === "boolean") {

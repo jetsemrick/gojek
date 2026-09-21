@@ -79,7 +79,7 @@ npm install
 npm run dev
 ```
 
-Opens the Vite checkout mock (default [http://localhost:5173](http://localhost:5173)).
+Opens the Vite checkout mock (default [http://localhost:5173](http://localhost:5173)). Still frames: [`docs/demo/`](./docs/demo/).
 
 1. Eligible CEPAAAT fixture: Payment Summary total **Rp85,000**, nudge `Save Rp3,500 with MURAAAH >`
 2. Tap the nudge → bottom sheet (25 min / 55 min, Rp85,000 vs Rp81,500)
