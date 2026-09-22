@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Screen name — prototype v1</title>
+  <style>
+    :root {
+      --color-bg: #f5f5f5;
+      --color-surface: #ffffff;
+      --color-text: #1a1a1a;
+      --color-text-muted: #6b7280;
+      --color-primary: #2563eb;
+      --color-primary-pressed: #1d4ed8;
+      --color-border: #e5e7eb;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --tap-min: 48px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+
+    .app {
+      max-width: 390px;
+      min-height: 100dvh;
+      margin: 0 auto;
+      background: var(--color-surface);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-top: env(safe-area-inset-top, 0);
+      padding-left: env(safe-area-inset-left, 0);
+      padding-right: env(safe-area-inset-right, 0);
+    }
+
+    .screen__header {
+      padding: calc(47px + var(--space-sm)) var(--space-md) var(--space-md);
+    }
+
+    .screen__header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .screen__body {
+      flex: 1;
+      padding: 0 var(--space-md) var(--space-lg);
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .screen__footer {
+      padding: var(--space-md);
+      padding-bottom: calc(env(safe-area-inset-bottom, 0) + var(--space-md));
+      border-top: 1px solid var(--color-border);
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: var(--radius-md);
+      min-height: var(--tap-min);
+      width: 100%;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    .btn:active {
+      background: var(--color-primary-pressed);
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.35);
+      outline-offset: 2px;
+    }
+
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .sheet-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--color-surface);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: var(--space-md);
+      padding-bottom: calc(env(safe-area-inset-bottom, 0) + var(--space-md));
+      transform: translateY(100%);
+      transition: transform 0.25s ease;
+    }
+
+    .sheet.is-open {
+      transform: translateY(0);
+    }
+
+    .sheet__handle {
+      width: 40px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--color-border);
+      margin: 0 auto var(--space-md);
+    }
+
+    .sheet__title {
+      margin: 0 0 var(--space-sm);
+      font-size: 1.125rem;
+    }
+
+    .sheet__body {
+      margin: 0 0 var(--space-lg);
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .sheet__actions {
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .btn--secondary {
+      background: transparent;
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+  </style>
+</head>
+<body>
+  <!--
+    Prototype: Screen name
+    Version: 1.0.0
+    Request: Replace with brief or research link
+    Changelog: Initial template — bottom sheet demo
+  -->
+  <div class="app">
+    <main class="screen" data-screen="template-screen">
+      <header class="screen__header">
+        <h1>Screen title</h1>
+      </header>
+
+      <section class="screen__body">
+        <p>Replace this body copy with the primary screen content from your brief or research summary.</p>
+        <p>Use the button below to demo a dismissible bottom sheet pattern.</p>
+      </section>
+
+      <footer class="screen__footer">
+        <button type="button" class="btn" id="open-sheet" aria-haspopup="dialog" aria-controls="demo-sheet">
+          Show bottom sheet
+        </button>
+      </footer>
+    </main>
+
+    <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
+
+    <aside
+      class="sheet"
+      id="demo-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="sheet-title"
+      aria-hidden="true"
+    >
+      <div class="sheet__handle" aria-hidden="true"></div>
+      <h2 class="sheet__title" id="sheet-title">Bottom sheet title</h2>
+      <p class="sheet__body">Short supporting copy. Safe-area padding and 48px tap targets are included by default.</p>
+      <div class="sheet__actions">
+        <button type="button" class="btn" id="sheet-primary">Primary action</button>
+        <button type="button" class="btn btn--secondary" id="sheet-dismiss">Dismiss</button>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const sheet = document.getElementById("demo-sheet");
+    const backdrop = document.getElementById("sheet-backdrop");
+    const openBtn = document.getElementById("open-sheet");
+    const dismissBtn = document.getElementById("sheet-dismiss");
+    const primaryBtn = document.getElementById("sheet-primary");
+
+    function setSheetOpen(isOpen) {
+      sheet.classList.toggle("is-open", isOpen);
+      backdrop.classList.toggle("is-open", isOpen);
+      sheet.setAttribute("aria-hidden", String(!isOpen));
+      backdrop.hidden = !isOpen;
+    }
+
+    openBtn.addEventListener("click", () => setSheetOpen(true));
+    dismissBtn.addEventListener("click", () => setSheetOpen(false));
+    primaryBtn.addEventListener("click", () => setSheetOpen(false));
+    backdrop.addEventListener("click", () => setSheetOpen(false));
+  </script>
+</body>
+</html>

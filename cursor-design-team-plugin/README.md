@@ -178,6 +178,7 @@ cursor-design-team-plugin/
 ├── .cursor-plugin/plugin.json
 ├── agents/design-research-verifier.md
 ├── commands/
+├── prototypes/          # HTML artifacts + notes (see _template-* starters)
 ├── rules/
 ├── skills/
 │   ├── design-request-research/
