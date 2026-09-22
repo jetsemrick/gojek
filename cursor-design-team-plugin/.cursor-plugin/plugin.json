@@ -1,0 +1,30 @@
+{
+  "name": "design-team",
+  "version": "0.1.0",
+  "description": "Figma and FigJam handoff, inspect, and review for mobile-first design workflows. Optimized for designers.",
+  "author": {
+    "name": "GoTo Design Team"
+  },
+  "keywords": [
+    "figma",
+    "figjam",
+    "design",
+    "handoff",
+    "mobile",
+    "react-native",
+    "swiftui",
+    "android"
+  ],
+  "logo": "assets/logo.svg",
+  "variables": {
+    "type": "object",
+    "properties": {
+      "FIGMA_ACCESS_TOKEN": {
+        "type": "string",
+        "title": "Figma access token",
+        "description": "Personal access token or MCP auth token for Figma. Set in Plugins → Configure — never commit to the repo."
+      }
+    },
+    "required": ["FIGMA_ACCESS_TOKEN"]
+  }
+}

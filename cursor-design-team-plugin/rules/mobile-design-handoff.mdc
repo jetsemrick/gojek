@@ -1,0 +1,48 @@
+---
+description: Mobile design handoff conventions for Figma frames — safe areas, touch targets, and platform patterns (React Native, SwiftUI, Android).
+alwaysApply: false
+globs: ["**/*.{tsx,jsx,swift,kt,kts}"]
+---
+
+# Mobile design handoff
+
+When inspecting or translating Figma mobile screens:
+
+## Frame and device assumptions
+
+- Treat frames as **mobile-first** unless the file name or frame label says otherwise.
+- Common widths: **390×844** (iPhone 14/15), **360×800** (Android baseline), **393×852** (iPhone 15 Pro).
+- Respect **safe areas**: status bar (~47–59pt), home indicator (~34pt), notch/Dynamic Island insets.
+- If the frame lacks a device chrome, note assumed insets in the handoff summary.
+
+## Touch and spacing
+
+- Minimum touch target: **44×44 pt** (iOS) / **48×48 dp** (Android).
+- Flag controls smaller than 44pt with a **accessibility warning** in handoff notes.
+- Prefer 8pt/4dp spacing grid; call out irregular gaps explicitly.
+
+## Platform patterns
+
+| Pattern | React Native | SwiftUI | Android (Compose) |
+| --- | --- | --- | --- |
+| Top bar | Header / custom | `NavigationStack` + toolbar | `TopAppBar` |
+| Bottom nav | Tab navigator | `TabView` | `NavigationBar` |
+| Lists | `FlatList` / `SectionList` | `List` | `LazyColumn` |
+| Sheets | `@gorhom/bottom-sheet` or Modal | `.sheet` | `ModalBottomSheet` |
+| Primary button | Pressable + style | `Button` | `Button` |
+
+Do not assume web CSS (flexbox in RN is similar but not identical; no `vh`/`vw`).
+
+## Handoff output format
+
+For each screen, include:
+
+1. **Screen name** and Figma node reference
+2. **Layout hierarchy** (header, scroll body, fixed footer)
+3. **Typography** (size, weight, line height)
+4. **Colors** (hex + semantic name if labeled in Figma)
+5. **Components** used (buttons, inputs, cards) with variant/state
+6. **Platform notes** (iOS vs Android differences if visible)
+7. **Open questions** for engineering or design
+
+Keep codegen **light** unless the designer explicitly asks for implementation code.

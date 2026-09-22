@@ -1,0 +1,48 @@
+---
+description: Figma and FigJam URL handling, node-id extraction, and file-type routing for design handoff.
+alwaysApply: true
+---
+
+# Figma & FigJam handoff
+
+## URL recognition
+
+Designers paste links from the browser. Accept these forms:
+
+- **Figma Design:** `https://www.figma.com/design/{fileKey}/{slug}?node-id={nodeId}`
+- **Figma (legacy):** `https://www.figma.com/file/{fileKey}/...?node-id={nodeId}`
+- **FigJam:** `https://www.figma.com/board/{fileKey}/...` or `.../figjam/...`
+- **Dev Mode / prototype links** — still valid; extract `fileKey` and `node-id`.
+
+### Node ID normalization
+
+Figma URLs encode node IDs with hyphens (e.g. `123-456`). MCP tools often expect colons (`123:456`). When calling Figma MCP:
+
+1. Parse `node-id` from the query string (decode `%3A` if present).
+2. Convert `-` to `:` for tool parameters when required.
+
+The agent cannot open the URL in a browser; it must pass **file key + node id** to MCP tools.
+
+## Route by file type
+
+| URL pattern | Workflow |
+| --- | --- |
+| `/design/` or `/file/` + frame/layer | Inspect design → handoff specs, mobile notes |
+| `/board/` or FigJam | FigJam summary → decisions, stickies, flows |
+| No `node-id` | Ask designer to select a frame/layer and copy link again |
+
+## Prompting style for designers
+
+- Use plain language: "spacing," "font size," "button states" — not "auto-layout flex gap."
+- Prefer **structured markdown** summaries over raw JSON dumps.
+- Include **screenshot references** when MCP returns image assets; do not invent visual details.
+- If MCP auth fails, tell the designer to check **Plugins → Configure → Figma access token** or complete OAuth for the remote server.
+
+## FigJam conventions
+
+When summarizing boards:
+
+- Group stickies by **section** or **color** when sections are labeled.
+- Surface **decisions**, **open questions**, and **action items** separately.
+- Describe **connectors/flows** as user journeys, not graph notation.
+- Note workshop metadata (date, participants) only if visible on the board.
