@@ -24,10 +24,18 @@ Or in chat:
 ## Steps
 
 1. **Parse URL** — Extract file key and node id; normalize id for MCP (`-` → `:`).
-2. **Load skill** — Follow `figma-inspect-handoff` skill instructions.
-3. **Call Figma MCP** — Fetch design context for the node.
-4. **Apply rules** — Use `mobile-design-handoff` and `figma-figjam-handoff` conventions.
-5. **Output** — Handoff markdown (layout, type, color, components, assets, a11y, open questions).
+2. **Preflight** — Confirm the official `figma-use` and
+   `figma-generate-design` skills and required remote tools are available.
+   - If missing, **stop** and tell the user to run `/add-plugin figma`, reload
+     Cursor, and retry.
+   - If disconnected, **stop** and tell the user to use
+     **Customize → Plugins → Figma → Connect/Authenticate**, complete OAuth,
+     and retry.
+   - Never request a PAT or configure a Bearer token.
+3. **Load skill** — Follow `figma-inspect-handoff` skill instructions.
+4. **Call Figma MCP** — Fetch design context for the node.
+5. **Apply rules** — Use `mobile-design-handoff` and `figma-figjam-handoff` conventions.
+6. **Output** — Handoff markdown (layout, type, color, components, assets, a11y, open questions).
 
 ## Output expectations
 
@@ -41,10 +49,11 @@ Or in chat:
 | Issue | Action |
 | --- | --- |
 | Missing `node-id` | Ask designer to copy link to selection |
-| MCP auth error | Check Plugins → Configure → `FIGMA_ACCESS_TOKEN` or complete Figma OAuth |
+| Official plugin missing | Run `/add-plugin figma`, reload Cursor, and retry |
+| MCP auth error | Authenticate with Figma OAuth from Customize → Plugins → Figma |
 | Wrong file type (FigJam) | Redirect to `/figjam-summary` command |
 
 ## Related
 
 - Skill: `figma-inspect-handoff`
-- For codegen: `figma-design-to-code` skill (explicit request only)
+- For implementation: start a separate scoped request using the official Figma plugin

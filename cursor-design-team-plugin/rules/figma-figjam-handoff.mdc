@@ -1,6 +1,6 @@
 ---
 description: Figma and FigJam URL handling, node-id extraction, and file-type routing for design handoff.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Figma & FigJam handoff
@@ -21,7 +21,9 @@ Figma URLs encode node IDs with hyphens (e.g. `123-456`). MCP tools often expect
 1. Parse `node-id` from the query string (decode `%3A` if present).
 2. Convert `-` to `:` for tool parameters when required.
 
-The agent cannot open the URL in a browser; it must pass **file key + node id** to MCP tools.
+For inspect calls, pass the **file key + node id** to the official Figma tools.
+For HTML export, use the separate localhost browser-capture workflow in
+`design-publish-figma`.
 
 ## Route by file type
 
@@ -36,7 +38,11 @@ The agent cannot open the URL in a browser; it must pass **file key + node id** 
 - Use plain language: "spacing," "font size," "button states" — not "auto-layout flex gap."
 - Prefer **structured markdown** summaries over raw JSON dumps.
 - Include **screenshot references** when MCP returns image assets; do not invent visual details.
-- If MCP auth fails, tell the designer to check **Plugins → Configure → Figma access token** or complete OAuth for the remote server.
+- If the official Figma plugin is missing, stop Figma-dependent work and tell
+  the designer to run `/add-plugin figma`, reload Cursor, and retry.
+- If authentication is required, stop and tell the designer to use
+  **Customize → Plugins → Figma → Connect/Authenticate** and complete OAuth.
+- Never request a PAT or configure a Bearer header.
 
 ## FigJam conventions
 

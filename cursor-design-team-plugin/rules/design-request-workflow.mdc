@@ -1,6 +1,6 @@
 ---
 description: Primary design request workflow — research, HTML canvas prototype, iterate. Routes phases and defines inputs/outputs.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Design request workflow
@@ -11,21 +11,22 @@ This plugin's **primary flow** is:
 Request → Research → HTML prototype → Iterate → Export to Figma
 ```
 
-Figma/FigJam inspect and summary are **secondary research inputs** in early phases; **Phase 4** pushes the approved HTML artifact into Figma.
+Figma/FigJam inspect and summary are **secondary research inputs**. The final,
+optional export stage captures the approved HTML artifact into Figma.
 
-## Phase detection
+## Stage detection
 
-| User signal | Phase | Action |
+| User signal | Stage | Action |
 | --- | --- | --- |
-| New brief, "design request", `/design-request` | Full workflow | Delegate to `design-request` agent or run all phases with checkpoints |
+| New brief, "design request", `/design-request` | Full workflow | `/design-request` command owns all stages and checkpoints |
 | "Research", "inspiration", `/design-research` | Research | `design-request-research` skill |
 | "Prototype", "HTML", "canvas", `/design-prototype` | Prototype | `design-prototype-html` skill + `html-prototype-standards` |
 | Feedback on existing HTML, `/design-iterate` | Iterate | `design-iterate-feedback` skill |
-| "Export to Figma", "push to Figma", approved HTML, `/design-export-figma` | Export | `design-export-figma` skill (requires Figma MCP auth) |
+| "Export to Figma", "push to Figma", approved HTML, `/design-export-figma` | Export | `design-publish-figma` skill (requires official Figma plugin + OAuth) |
 | Figma frame URL + "inspect" only | Secondary | `inspect-design` / `figma-inspect-handoff` |
 | FigJam URL + "summarize" only | Secondary | `figjam-summary` |
 
-## Phase inputs & outputs
+## Stage inputs and outputs
 
 ### 1. Research
 
@@ -48,16 +49,31 @@ Figma/FigJam inspect and summary are **secondary research inputs** in early phas
 ### 4. Export to Figma
 
 - **In:** Approved HTML artifact path; optional `--figma-file-key` for update mode
-- **Out:** Figma file/frame URL + export summary; notes entry with export link
-- **Requires:** Figma MCP auth (`FIGMA_ACCESS_TOKEN` or desktop MCP)
-- **Do not:** Export unapproved prototypes; do not skip mobile frame conventions (390px, safe areas)
+- **Action:** Serve the HTML locally and capture its live browser rendering with
+  remote `generate_figma_design`
+- **Out:** Exact Figma file/frame URL + export summary; notes entry with export link
+- **Requires:** Official Figma plugin capabilities and completed OAuth
+- **Do not:** Configure PAT/Bearer auth, use the desktop MCP for capture, or
+  manually rebuild the DOM through `use_figma`
 
 ## Checkpoints
 
 - After research: confirm before prototype unless user said "run all phases."
 - After prototype: invite review; suggest `/design-iterate` with feedback bullets.
 - After iterate: list deferred items and current version number; offer `/design-export-figma` when approved.
-- After export: return Figma URL and note any MCP/export limitations.
+- After export: return the exact Figma URL and note capture limitations.
+
+## Figma preflight
+
+Before any Figma tool call:
+
+1. Confirm the official `figma-use` and `figma-generate-design` skills and the
+   needed remote tools are available.
+2. If missing, stop the Figma-dependent stage and instruct the user to run
+   `/add-plugin figma`, reload Cursor, and retry.
+3. If disconnected, stop and instruct the user to authenticate through
+   **Customize → Plugins → Figma** using OAuth.
+4. Never request a PAT or add a Bearer header.
 
 ## File conventions
 

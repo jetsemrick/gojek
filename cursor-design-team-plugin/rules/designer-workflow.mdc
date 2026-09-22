@@ -1,6 +1,6 @@
 ---
 description: Designer-first Cursor workflow — design request research, HTML canvas prototypes, iteration; Figma/FigJam as secondary research inputs.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Designer workflow in Cursor
@@ -11,11 +11,13 @@ This plugin is for **designers**. The primary flow is **design request → resea
 
 | Step | Command / agent | Output |
 | --- | --- | --- |
-| 1. Research | `/design-research` or **Design Request** agent | Inspiration & pattern summary |
+| 1. Research | `/design-research` | Inspiration & pattern summary |
 | 2. Prototype | `/design-prototype` | Mobile HTML canvas artifact |
 | 3. Iterate | `/design-iterate` | Updated artifact + changelog |
+| 4. Export (optional) | `/design-export-figma` | Captured Figma Design URL |
 
-Run all three with checkpoints: `/design-request <brief>`
+Run the complete workflow with checkpoints: `/design-request <brief>`.
+`/design-request` is the sole orchestrator.
 
 ## Secondary capabilities (Figma / FigJam)
 
@@ -23,10 +25,12 @@ Run all three with checkpoints: `/design-request <brief>`
 | --- | --- |
 | Existing team frame specs | `/inspect-design` or `figma-inspect-handoff` skill |
 | Workshop board summary | `/figjam-summary` |
-| Light mobile codegen (explicit ask) | `figma-design-to-code` skill — single screen only |
-| Code Connect (future) | `figma-code-connect` skill (stub) |
+| Verify public/mobile research | `design-research-verifier` agent |
+| Figma skills or Code Connect | Official Figma plugin (`/add-plugin figma`) |
+| Capture approved HTML | `design-publish-figma` skill through `/design-export-figma` |
 
 Use Figma/FigJam during **research** when URLs are available — not as a substitute for HTML prototypes.
+Do not bundle copies of official Figma skills.
 
 ## Default behavior
 
@@ -36,7 +40,7 @@ Use Figma/FigJam during **research** when URLs are available — not as a substi
 4. **Version iterations** — Every feedback round updates changelog and version comment.
 5. **Preserve design intent** — Call out ambiguities instead of guessing product decisions.
 
-## Review checklist (before Figma polish)
+## Review checklist (before Figma capture)
 
 - [ ] Prototype matches brief and research scope
 - [ ] 390px mobile viewport and safe areas verified
@@ -44,6 +48,7 @@ Use Figma/FigJam during **research** when URLs are available — not as a substi
 - [ ] Touch targets ≥ 44px; focus states visible
 - [ ] Changelog and open questions up to date in companion notes
 - [ ] Platform-specific variants noted if applicable
+- [ ] Official Figma plugin and OAuth preflight passes for export
 
 ## What not to do in MVP
 
@@ -51,6 +56,7 @@ Use Figma/FigJam during **research** when URLs are available — not as a substi
 - Do not scaffold full apps, navigation stacks, or CI pipelines unless explicitly requested.
 - Do not replace Figma for final polish — HTML prototype precedes Figma refinement.
 - Do not default to Figma-handoff-only when a design **request** is submitted.
+- Do not configure Figma PAT/Bearer auth or a second Figma MCP server.
 
 ## Example prompts (designer-friendly)
 

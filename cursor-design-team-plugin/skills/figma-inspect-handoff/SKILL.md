@@ -13,6 +13,19 @@ description: Secondary research input — inspect Figma frames and produce mobil
 
 Primary output is **documentation**, not code.
 
+## Required preflight
+
+Figma access comes from Figma's official Cursor plugin.
+
+1. Confirm the official `figma-use` and `figma-generate-design` skills and the
+   required remote Figma read tools are available.
+2. If missing, **stop** and instruct the user to run `/add-plugin figma`, reload
+   Cursor, and retry.
+3. If disconnected, **stop** and instruct the user to open
+   **Customize → Plugins → Figma**, choose **Connect/Authenticate**, and
+   complete OAuth.
+4. Never request a PAT or configure a Bearer token.
+
 ## Workflow
 
 ### 1. Accept the Figma URL
@@ -92,6 +105,7 @@ If the designer asks for **review** rather than specs, add:
 
 ## Do not
 
-- Generate full implementation unless separately requested via `figma-design-to-code`.
+- Generate full implementation unless the user explicitly starts a separate,
+  scoped implementation request using the official Figma plugin.
 - Invent colors or fonts not returned by MCP.
 - Require or reference `DESIGN_TOKEN_PATH`.

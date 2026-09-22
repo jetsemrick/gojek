@@ -41,7 +41,16 @@ Restate the request in one paragraph. List:
 - Cite sources with links; do not copy proprietary assets.
 
 **Internal / team sources (when URLs provided):**
-- Figma frames → use `figma-inspect-handoff` skill + Figma MCP for existing team patterns.
+- Figma frames → first confirm the official `figma-use` and
+  `figma-generate-design` skills and required remote tools exist. If not,
+  **stop the Figma branch** and instruct the user to run `/add-plugin figma`,
+  reload Cursor, and retry.
+- If the official plugin is installed but disconnected, **stop the Figma
+  branch** and instruct the user to complete OAuth from
+  **Customize → Plugins → Figma → Connect/Authenticate**.
+- Never request a PAT or configure a Bearer token.
+- After preflight passes, use `figma-inspect-handoff` for existing team
+  patterns.
 - FigJam boards → use `/figjam-summary` patterns for workshop context.
 
 ### 3. Synthesize findings
@@ -84,6 +93,10 @@ Ready for `/design-prototype` — [one sentence on what to build first]
 ### 4. Hand off to prototype phase
 
 End with explicit readiness: either proceed to prototype (if user asked for full flow) or pause for designer approval.
+
+For high-impact or weakly sourced findings, the calling command may use the
+`design-research-verifier` agent for one bounded verification report. That
+agent does not orchestrate later stages.
 
 ## Example prompts
 

@@ -28,8 +28,17 @@ Run **Phase 1 (Research)** of the design request workflow.
 1. Load `design-request-research` skill.
 2. Apply `design-request-workflow` rule.
 3. Scope the request; gather public inspiration (web search when available).
-4. If Figma/FigJam URLs are in the brief, use MCP + secondary inspect/summary skills.
-5. Output research summary markdown with recommended prototype scope.
+4. If Figma/FigJam URLs are in the brief, run the official Figma plugin
+   preflight before any Figma call:
+   - Missing capabilities: stop that branch and instruct the user to run
+     `/add-plugin figma`, reload Cursor, and retry.
+   - Disconnected plugin: stop that branch and instruct the user to complete
+     OAuth from **Customize → Plugins → Figma**.
+   - Never request a PAT or configure a Bearer token.
+5. Use the secondary inspect/summary workflow only after preflight passes.
+6. Optionally delegate an isolated evidence check to
+   `design-research-verifier`; it does not own the workflow.
+7. Output research summary markdown with recommended prototype scope.
 
 ## Output
 

@@ -1,11 +1,12 @@
 ---
 name: design-request
-description: Kick off the full design request workflow — research, HTML canvas prototype, and iteration checkpoints.
+description: Sole orchestrator for research, HTML prototype, feedback iteration, and optional Figma export.
 ---
 
 # Design request (full workflow)
 
-Start the **4-phase design request workflow** for a new mobile design request.
+Orchestrate the end-to-end design request workflow. Do not delegate ownership of
+the multi-turn workflow to a subagent.
 
 ## Usage
 
@@ -19,16 +20,14 @@ Start the **4-phase design request workflow** for a new mobile design request.
 /design-request Mobile onboarding for a savings app — 3 steps, trust signals, optional biometrics, 390px mobile. Research public patterns first, then HTML prototype.
 ```
 
-Or delegate to the **Design Request** agent with the same brief in chat.
+## Stages
 
-## Phases
-
-| # | Phase | Skill | Output |
+| # | Stage | Skill | Output |
 | --- | --- | --- | --- |
 | 1 | Research | `design-request-research` | Research summary |
 | 2 | Prototype | `design-prototype-html` | HTML canvas artifact + notes |
 | 3 | Iterate | `design-iterate-feedback` | Updated artifact (when feedback provided) |
-| 4 | Export to Figma | `design-export-figma` | Figma file/frame URL (when approved) |
+| 4 | Export to Figma | `design-publish-figma` | Figma file/frame URL (when approved) |
 
 ## Steps
 
@@ -38,12 +37,20 @@ Or delegate to the **Design Request** agent with the same brief in chat.
 4. **Prototype** — Self-contained mobile HTML per `html-prototype-standards`.
 5. **Review** — Share preview instructions; collect feedback.
 6. **Iterate** — Run `/design-iterate` or continue in same thread with feedback.
-7. **Export** — When approved, run `/design-export-figma <html-path>` to push into Figma.
+7. **Export** — When approved, follow `design-publish-figma` or ask the
+   designer to run `/design-export-figma <html-path>`.
 
-## Rules & agent
+Before any Figma-dependent work, apply the Figma preflight from the selected
+skill. Missing official plugin capabilities or OAuth is a hard stop for that
+work; it does not block HTML-only research, prototype, or iteration.
 
-- Agent: `design-request` (`agents/design-request-agent.md`)
+## Rules and optional verifier
+
 - Rules: `design-request-workflow`, `html-prototype-standards`
+- Optional isolated research check: `design-research-verifier`
+
+`design-research-verifier` returns a bounded report. It never orchestrates the
+workflow or owns designer feedback loops.
 
 ## Related commands
 

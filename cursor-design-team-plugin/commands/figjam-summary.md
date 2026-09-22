@@ -24,9 +24,18 @@ Or in chat:
 ## Steps
 
 1. **Parse URL** — Confirm `/board/` or FigJam file key; extract file key.
-2. **Call Figma MCP** — Read board content (stickies, sections, connectors, shapes) via available FigJam tools.
-3. **Apply rules** — Follow `figma-figjam-handoff` grouping conventions.
-4. **Output** — Structured summary (see template below).
+2. **Preflight** — Confirm the official `figma-use` and
+   `figma-generate-design` skills and required remote FigJam tools are
+   available.
+   - If missing, **stop** and tell the user to run `/add-plugin figma`, reload
+     Cursor, and retry.
+   - If disconnected, **stop** and tell the user to use
+     **Customize → Plugins → Figma → Connect/Authenticate**, complete OAuth,
+     and retry.
+   - Never request a PAT or configure a Bearer token.
+3. **Call Figma MCP** — Read board content (stickies, sections, connectors, shapes) via available FigJam tools.
+4. **Apply rules** — Follow `figma-figjam-handoff` grouping conventions.
+5. **Output** — Structured summary (see template below).
 
 ## Output template
 
@@ -70,7 +79,9 @@ Or in chat:
 | --- | --- |
 | URL is Figma Design, not FigJam | Use `/inspect-design` instead |
 | Empty or sparse board | Report what MCP returned; ask if the correct board link was shared |
-| MCP lacks FigJam tools | Note blocker; suggest manual export or desktop FigJam review |
+| Official plugin missing | Run `/add-plugin figma`, reload Cursor, and retry |
+| OAuth required | Authenticate from Customize → Plugins → Figma |
+| MCP lacks FigJam tools | Note blocker; suggest manual export or browser review |
 
 ## Related
 
