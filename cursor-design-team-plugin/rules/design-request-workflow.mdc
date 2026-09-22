@@ -1,0 +1,61 @@
+---
+description: Primary design request workflow — research, HTML canvas prototype, iterate. Routes phases and defines inputs/outputs.
+alwaysApply: true
+---
+
+# Design request workflow
+
+This plugin's **primary flow** is:
+
+```text
+Request → Research → HTML prototype → Iterate
+```
+
+Figma/FigJam inspect and summary are **secondary research inputs**, not the default deliverable.
+
+## Phase detection
+
+| User signal | Phase | Action |
+| --- | --- | --- |
+| New brief, "design request", `/design-request` | Full workflow | Delegate to `design-request` agent or run all phases with checkpoints |
+| "Research", "inspiration", `/design-research` | Research | `design-request-research` skill |
+| "Prototype", "HTML", "canvas", `/design-prototype` | Prototype | `design-prototype-html` skill + `html-prototype-standards` |
+| Feedback on existing HTML, `/design-iterate` | Iterate | `design-iterate-feedback` skill |
+| Figma frame URL + "inspect" only | Secondary | `inspect-design` / `figma-inspect-handoff` |
+| FigJam URL + "summarize" only | Secondary | `figjam-summary` |
+
+## Phase inputs & outputs
+
+### 1. Research
+
+- **In:** Brief, constraints, optional URLs
+- **Out:** Research summary markdown (inspiration, patterns, prototype scope)
+- **Do not:** Write HTML or production code
+
+### 2. Prototype
+
+- **In:** Research summary or inline brief
+- **Out:** Self-contained `.html` + companion notes with version/changelog
+- **Do not:** Multi-file apps, desktop layouts, or deep RN/SwiftUI codegen
+
+### 3. Iterate
+
+- **In:** Artifact path + feedback
+- **Out:** Updated HTML + appended changelog
+- **Do not:** Restart research unless user expands scope
+
+## Checkpoints
+
+- After research: confirm before prototype unless user said "run all phases."
+- After prototype: invite review; suggest `/design-iterate` with feedback bullets.
+- After iterate: list deferred items and current version number.
+
+## File conventions
+
+- Prototypes: `prototypes/<slug>-v1.html`
+- Notes: `prototypes/<slug>-notes.md`
+- Respect team paths if user specifies otherwise.
+
+## Canvas artifacts
+
+HTML prototypes must be previewable in Cursor's canvas/artifact panel — self-contained, mobile-first, no build step required for MVP.

@@ -1,16 +1,21 @@
 {
   "name": "design-team",
-  "version": "0.1.0",
-  "description": "Figma and FigJam handoff, inspect, and review for mobile-first design workflows. Optimized for designers.",
+  "version": "0.2.0",
+  "description": "Design request workflow for mobile teams — research inspiration, build HTML canvas prototypes, iterate from feedback. Figma and FigJam supported as research inputs.",
   "author": {
     "name": "GoTo Design Team"
   },
   "keywords": [
+    "design-request",
+    "design-research",
+    "html-prototype",
+    "canvas-artifact",
+    "mobile",
+    "design",
     "figma",
     "figjam",
-    "design",
-    "handoff",
-    "mobile",
+    "prototype",
+    "iteration",
     "react-native",
     "swiftui",
     "android"
@@ -22,9 +27,9 @@
       "FIGMA_ACCESS_TOKEN": {
         "type": "string",
         "title": "Figma access token",
-        "description": "Personal access token or MCP auth token for Figma. Set in Plugins → Configure — never commit to the repo."
+        "description": "Personal access token or MCP auth token for Figma. Required only when using Figma/FigJam URLs in research. Set in Plugins → Configure — never commit to the repo."
       }
     },
-    "required": ["FIGMA_ACCESS_TOKEN"]
+    "required": []
   }
 }

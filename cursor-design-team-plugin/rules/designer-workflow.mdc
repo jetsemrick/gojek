@@ -1,47 +1,61 @@
 ---
-description: Designer-first Cursor workflow — when to inspect, review, or request light codegen; review checklists for mobile handoff.
+description: Designer-first Cursor workflow — design request research, HTML canvas prototypes, iteration; Figma/FigJam as secondary research inputs.
 alwaysApply: true
 ---
 
 # Designer workflow in Cursor
 
-This plugin is for **designers**, not deep engineering codegen. Default to inspect, summarize, and review.
+This plugin is for **designers**. The primary flow is **design request → research → HTML prototype → iterate**. Default to research summaries and canvas HTML artifacts, not deep engineering codegen.
 
-## Default behavior
+## Primary workflow
 
-1. **Inspect before implement** — Run inspect/handoff before any code generation.
-2. **Ask the platform** — React Native, SwiftUI, or Android if implementation is requested.
-3. **One screen at a time** — Hand off frame-by-frame, not entire files unless asked.
-4. **Preserve design intent** — Call out ambiguities instead of guessing engineering behavior.
+| Step | Command / agent | Output |
+| --- | --- | --- |
+| 1. Research | `/design-research` or **Design Request** agent | Inspiration & pattern summary |
+| 2. Prototype | `/design-prototype` | Mobile HTML canvas artifact |
+| 3. Iterate | `/design-iterate` | Updated artifact + changelog |
 
-## When to use each capability
+Run all three with checkpoints: `/design-request <brief>`
+
+## Secondary capabilities (Figma / FigJam)
 
 | Designer intent | Use |
 | --- | --- |
-| "What's in this frame?" / specs for dev | `inspect-design` command or `figma-inspect-handoff` skill |
-| "Summarize our workshop board" | `figjam-summary` command |
-| "Rough RN/SwiftUI for this screen" | `figma-design-to-code` skill (mobile, single screen) |
-| "Map component to code" (future) | `figma-code-connect` skill (stub) |
+| Existing team frame specs | `/inspect-design` or `figma-inspect-handoff` skill |
+| Workshop board summary | `/figjam-summary` |
+| Light mobile codegen (explicit ask) | `figma-design-to-code` skill — single screen only |
+| Code Connect (future) | `figma-code-connect` skill (stub) |
 
-## Review checklist (before marking handoff ready)
+Use Figma/FigJam during **research** when URLs are available — not as a substitute for HTML prototypes.
 
-- [ ] Frame URL includes `node-id`
-- [ ] All interactive states documented (default, pressed, disabled, error)
-- [ ] Typography and colors captured with units
-- [ ] Safe areas and scroll behavior described
-- [ ] Assets/export notes listed (icons, illustrations)
-- [ ] Platform-specific variants noted (iOS vs Android)
-- [ ] Open questions assigned (design vs engineering)
+## Default behavior
+
+1. **Research before prototype** — Gather inspiration and scope unless user skips research.
+2. **HTML before Figma polish** — Canvas artifact is the review vehicle for MVP.
+3. **One screen at a time** — Prototype focused flows; expand when asked.
+4. **Version iterations** — Every feedback round updates changelog and version comment.
+5. **Preserve design intent** — Call out ambiguities instead of guessing product decisions.
+
+## Review checklist (before Figma polish)
+
+- [ ] Prototype matches brief and research scope
+- [ ] 390px mobile viewport and safe areas verified
+- [ ] Interactive states documented (default, error, empty as scoped)
+- [ ] Touch targets ≥ 44px; focus states visible
+- [ ] Changelog and open questions up to date in companion notes
+- [ ] Platform-specific variants noted if applicable
 
 ## What not to do in MVP
 
 - Do not sync or export design tokens (no token path configured).
 - Do not scaffold full apps, navigation stacks, or CI pipelines unless explicitly requested.
-- Do not replace Figma — Cursor augments handoff and review.
+- Do not replace Figma for final polish — HTML prototype precedes Figma refinement.
+- Do not default to Figma-handoff-only when a design **request** is submitted.
 
 ## Example prompts (designer-friendly)
 
-- "Inspect this mobile login screen for handoff: [Figma URL]"
-- "Summarize decisions from this FigJam retro: [FigJam URL]"
-- "Review this checkout frame for accessibility and touch targets: [Figma URL]"
-- "Suggest SwiftUI structure for this profile header only: [Figma URL]"
+- `/design-request Mobile savings nudge at checkout — bottom sheet, trust copy, 390px`
+- `/design-research Sticky CTA patterns above home indicator on iOS`
+- `/design-prototype Login screen from research — email, SSO, error state`
+- `/design-iterate prototypes/login-v1.html — shorten headline, add forgot password link`
+- "Inspect our existing login frame for reference: [Figma URL]" (secondary)

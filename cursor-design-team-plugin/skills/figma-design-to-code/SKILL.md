@@ -1,6 +1,6 @@
 ---
 name: figma-design-to-code
-description: Mobile-first design-to-code guidance from Figma frames. Use when a designer asks to implement a screen in React Native, SwiftUI, or Android — light snippets only, not full app codegen.
+description: Secondary capability — mobile design-to-code from Figma when explicitly requested. Primary workflow uses HTML canvas prototypes (design-prototype-html); use this only for light RN/SwiftUI/Compose snippets, not full app codegen.
 ---
 
 # Figma design to code (mobile)

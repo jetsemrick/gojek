@@ -1,6 +1,6 @@
 ---
 name: figma-inspect-handoff
-description: Inspect Figma frames and produce designer-friendly mobile handoff notes — layout, typography, colors, components, and platform guidance. Use for design review and dev handoff, not codegen.
+description: Secondary research input — inspect Figma frames and produce mobile handoff notes. Use during design-request research when team Figma URLs are provided, not as the primary prototype deliverable.
 ---
 
 # Figma inspect & handoff

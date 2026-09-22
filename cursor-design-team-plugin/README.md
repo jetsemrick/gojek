@@ -1,56 +1,90 @@
 # Design Team Cursor Plugin
 
-Cursor plugin for the GoTo design team: **Figma + FigJam** handoff, inspect, and review — optimized for **designers** and **mobile-first** workflows (React Native, SwiftUI, Android).
+Cursor plugin for the GoTo design team: **design request workflow** — research inspiration, build **HTML canvas prototypes**, and iterate from feedback — optimized for **designers** and **mobile-first** development.
+
+## North star workflow
+
+```text
+Design request → Research → HTML prototype → Iterate
+```
+
+| Phase | Command | Output |
+| --- | --- | --- |
+| **Research** | `/design-research` | Inspiration & pattern summary |
+| **Prototype** | `/design-prototype` | Self-contained mobile HTML canvas artifact |
+| **Iterate** | `/design-iterate` | Updated artifact + changelog |
+
+Run the full flow (with checkpoints): `/design-request <brief>`
+
+**Design Request Agent** (`agents/design-request-agent.md`) orchestrates all three phases.
 
 ## What's included
 
 | Component | Purpose |
 | --- | --- |
-| **Figma MCP** | Connect to Figma/FigJam via remote MCP server |
-| **Skills** | Mobile design-to-code, inspect/handoff, Code Connect stub |
-| **Rules** | Mobile handoff, Figma/FigJam URLs, designer workflow |
-| **Commands** | `inspect-design`, `figjam-summary` |
+| **Agent** | `design-request` — orchestrates research → prototype → iterate |
+| **Skills** | `design-request-research`, `design-prototype-html`, `design-iterate-feedback` |
+| **Commands** | `/design-request`, `/design-research`, `/design-prototype`, `/design-iterate` |
+| **Rules** | `design-request-workflow`, `html-prototype-standards`, mobile + designer conventions |
+| **Figma MCP** | Optional — inspect frames & summarize FigJam boards as **research inputs** |
+| **Legacy commands** | `/inspect-design`, `/figjam-summary` (secondary) |
 
-**MVP exclusions:** No design token sync, no `DESIGN_TOKEN_PATH`, no deep codegen.
+**MVP exclusions:** No design token sync, no `DESIGN_TOKEN_PATH`, no deep multi-file codegen.
+
+## HTML canvas prototypes
+
+Prototypes are **self-contained `.html` files** (inline CSS, vanilla JS) that designers preview in Cursor's **canvas / artifact** panel:
+
+- **390px** mobile viewport with safe-area insets
+- Semantic structure mappable to Figma frames later
+- Version comment in HTML + companion `*-notes.md` changelog
+
+Default paths: `prototypes/<slug>-v1.html` and `prototypes/<slug>-notes.md`.
 
 ## Prerequisites
 
 - [Cursor](https://cursor.com) with plugin / MCP support
-- Figma account with access to team files
-- Figma MCP auth (see Configuration below)
+- Figma account (optional — only when using Figma/FigJam URLs in research)
 
 ## Install (team marketplace)
 
 1. Team admin adds this repository to the **private team marketplace** in Cursor.
 2. Designers install **Design Team** from **Customize → Plugins** (team catalog).
-3. Open **Plugins → Configure** on the installed plugin.
-4. Set **Figma access token** (`FIGMA_ACCESS_TOKEN`).
-5. Restart or reload MCP if prompted; confirm **Figma** server shows connected.
+3. If using Figma/FigJam in research: **Plugins → Configure → Figma access token** (`FIGMA_ACCESS_TOKEN`).
+4. Reload MCP if prompted.
 
 ## Local test (development)
 
-Test the plugin from a checkout before publishing to the team marketplace.
-
-### Option A — Open plugin folder as workspace
-
-1. Clone or copy this repo to your machine.
+1. Clone repo; checkout branch `cursor/design-team-plugin-scaffold`.
 2. In Cursor: **File → Open Folder** → select `cursor-design-team-plugin/`.
-3. Configure MCP variables locally (see Configuration).
-4. In agent chat, try:
-   - `/inspect-design <figma-frame-url-with-node-id>`
-   - `/figjam-summary <figjam-board-url>`
+3. In agent chat, try:
 
-### Option B — Symlink / dev install
+```
+/design-request Mobile savings nudge — bottom sheet at checkout, dismissible, 390px
+```
 
-If your Cursor version supports loading a local plugin path from team marketplace dev settings, point it at this directory. Otherwise use Option A.
+Or phase by phase:
+
+```
+/design-research Sticky CTA patterns for mobile checkout
+/design-prototype Savings nudge bottom sheet from research above
+/design-iterate prototypes/savings-nudge-v1.html — increase CTA tap target to 48px
+```
+
+Secondary Figma flows (optional):
+
+```
+/inspect-design https://www.figma.com/design/...?node-id=...
+/figjam-summary https://www.figma.com/board/...
+```
 
 ### Verify checklist
 
-- [ ] `.cursor-plugin/plugin.json` validates (name: `design-team`)
-- [ ] `mcp.json` loads; Figma MCP connects
-- [ ] Rules appear under project rules when plugin is active
-- [ ] Skills trigger on Figma URL prompts
-- [ ] Commands run without missing file errors
+- [ ] `.cursor-plugin/plugin.json` validates (name: `design-team`, version ≥ 0.2.0)
+- [ ] Agent `design-request` appears in subagent list
+- [ ] Commands `/design-request` through `/design-iterate` run without missing file errors
+- [ ] HTML prototype follows `html-prototype-standards` (390px, safe areas)
+- [ ] Figma MCP connects when token configured (optional)
 
 ## Configuration
 
@@ -58,9 +92,9 @@ If your Cursor version supports loading a local plugin path from team marketplac
 
 | Variable | Required | Where to set |
 | --- | --- | --- |
-| `FIGMA_ACCESS_TOKEN` | Yes | Team marketplace **Plugins → Configure** (never commit secrets) |
+| `FIGMA_ACCESS_TOKEN` | Optional* | Team marketplace **Plugins → Configure** |
 
-Declared in `.cursor-plugin/plugin.json` and referenced in `mcp.json`:
+\*Required only when research includes Figma/FigJam MCP calls. HTML-only workflows need no token.
 
 ```json
 {
@@ -75,82 +109,82 @@ Declared in `.cursor-plugin/plugin.json` and referenced in `mcp.json`:
 }
 ```
 
-### Auth note
-
-Figma's remote MCP server [official docs](https://developers.figma.com/docs/figma-mcp-server/remote-server-installation/) describe **OAuth** as the primary flow. Confirm with your team whether PAT/Bearer via `FIGMA_ACCESS_TOKEN` is supported for marketplace installs, or if OAuth-only configuration is required.
-
-**Alternative — Figma desktop MCP** (local):
-
-```json
-{
-  "mcpServers": {
-    "figma-desktop": {
-      "url": "http://127.0.0.1:3845/mcp"
-    }
-  }
-}
-```
-
-Enable in Figma desktop: Dev Mode → MCP server toggle. No token variable needed for local desktop server.
+**Alternative — Figma desktop MCP:** `http://127.0.0.1:3845/mcp` (Dev Mode toggle; no token).
 
 ## Usage (designers)
 
-### Inspect a mobile screen
-
-1. In Figma, select a frame → **Copy link to selection**.
-2. In Cursor chat:
-
-   ```
-   /inspect-design https://www.figma.com/design/...?node-id=...
-   ```
-
-3. Review handoff markdown (spacing, type, colors, components, a11y notes).
-
-### Summarize a FigJam board
+### Full design request
 
 ```
-/figjam-summary https://www.figma.com/board/...
+/design-request <problem, user, platform, must-haves>
 ```
 
-### Light mobile codegen (optional)
+Agent runs research → prototype → pauses for review → iterate on feedback.
 
-Ask explicitly with platform:
+### Research only
 
-> Suggest React Native layout for this screen only: [Figma URL]
+```
+/design-research <question or brief>
+```
 
-Uses `figma-design-to-code` skill — single-screen snippets, not full apps.
+### Prototype only
 
-## Publish to team marketplace (admins)
+```
+/design-prototype <brief or "from research above">
+```
 
-**Do not** publish to the public cursor.com marketplace for this plugin — **private team marketplace only**.
+### Iterate on feedback
 
-1. Push this repo to your org's Git host (GitHub, GitLab, etc.).
-2. In Cursor team settings, add a **team marketplace** entry pointing at the repo.
-3. For multi-plugin repos, add `.cursor-plugin/marketplace.json` at repo root (not required for single-plugin repo).
-4. Set plugin visibility to **team only**.
-5. Notify designers to install and configure `FIGMA_ACCESS_TOKEN`.
-6. Smoke-test: one Design inspect + one FigJam summary on real team files.
+```
+/design-iterate prototypes/<file>.html — <bullet feedback>
+```
+
+### Figma / FigJam (secondary research)
+
+- **Inspect frame:** `/inspect-design <figma-url-with-node-id>`
+- **Summarize board:** `/figjam-summary <figjam-url>`
 
 ## Repository structure
 
 ```
 cursor-design-team-plugin/
 ├── .cursor-plugin/plugin.json
+├── agents/design-request-agent.md
 ├── mcp.json
 ├── rules/
+│   ├── design-request-workflow.mdc
+│   ├── html-prototype-standards.mdc
+│   └── ...
 ├── skills/
+│   ├── design-request-research/
+│   ├── design-prototype-html/
+│   ├── design-iterate-feedback/
+│   └── figma-*/
 ├── commands/
+│   ├── design-request.md
+│   ├── design-research.md
+│   ├── design-prototype.md
+│   ├── design-iterate.md
+│   └── inspect-design.md, figjam-summary.md
 ├── assets/logo.svg
 └── README.md
 ```
 
-## Support & blockers
+## Publish to team marketplace (admins)
 
-- **MCP URL:** `https://mcp.figma.com/mcp` (remote, recommended)
-- **Auth model:** Confirm OAuth vs PAT with team admin
-- **FigJam tool coverage:** Verify MCP tools support board read on your plan
-- **Token sync:** Intentionally out of scope for MVP
+**Private team marketplace only** — not public cursor.com/marketplace.
+
+1. Push to org Git host.
+2. Add team marketplace entry in Cursor team settings.
+3. Smoke-test: one `/design-request` flow + one `/design-iterate` cycle.
+
+## Support & open questions
+
+- **Web search:** Confirm team policy for external inspiration in research phase.
+- **Canvas artifacts:** Confirm HTML preview behavior in your Cursor build.
+- **Figma auth:** OAuth vs PAT for marketplace installs.
+- **Prototype paths:** Align on repo folder convention vs ephemeral artifacts.
 
 ## License
 
-Internal team use — confirm license with GoTo design/platform leads before external distribution.
+Internal team use — confirm with GoTo design/platform leads before external distribution.
