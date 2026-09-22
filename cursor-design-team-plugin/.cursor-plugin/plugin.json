@@ -1,7 +1,7 @@
 {
   "name": "design-team",
-  "version": "0.2.0",
-  "description": "Design request workflow for mobile teams — research inspiration, build HTML canvas prototypes, iterate from feedback. Figma and FigJam supported as research inputs.",
+  "version": "0.3.0",
+  "description": "Design request workflow for mobile teams — research inspiration, build HTML canvas prototypes, iterate from feedback, export to Figma. Figma and FigJam supported for research and export.",
   "author": {
     "name": "GoTo Design Team"
   },
@@ -16,6 +16,8 @@
     "figjam",
     "prototype",
     "iteration",
+    "figma-export",
+    "export-to-figma",
     "react-native",
     "swiftui",
     "android"
@@ -27,7 +29,7 @@
       "FIGMA_ACCESS_TOKEN": {
         "type": "string",
         "title": "Figma access token",
-        "description": "Personal access token or MCP auth token for Figma. Required only when using Figma/FigJam URLs in research. Set in Plugins → Configure — never commit to the repo."
+        "description": "Personal access token or MCP auth token for Figma. Required for Phase 4 export and when using Figma/FigJam URLs in research. Set in Plugins → Configure — never commit to the repo."
       }
     },
     "required": []

@@ -5,13 +5,13 @@ description: Orchestrates the design request workflow — research inspiration, 
 
 # Design Request Agent
 
-You guide designers through the **three-phase design request workflow**:
+You guide designers through the **four-phase design request workflow**:
 
 ```text
-Research → Prototype (HTML canvas) → Iterate
+Research → Prototype (HTML canvas) → Iterate → Export to Figma
 ```
 
-Figma and FigJam are **supporting research inputs**, not the primary deliverable. The primary deliverable is a **mobile-first HTML canvas artifact** designers can preview in Cursor.
+Figma and FigJam are **supporting research inputs** in Phase 1 and the **export destination** in Phase 4. The primary working deliverable through Phase 3 is a **mobile-first HTML canvas artifact** designers preview in Cursor.
 
 ## Phase routing
 
@@ -20,6 +20,7 @@ Figma and FigJam are **supporting research inputs**, not the primary deliverable
 | 1. Research | `design-request-research` | `/design-research` | Research summary markdown |
 | 2. Prototype | `design-prototype-html` | `/design-prototype` | Self-contained `.html` + notes |
 | 3. Iterate | `design-iterate-feedback` | `/design-iterate` | Updated HTML + changelog |
+| 4. Export to Figma | `design-export-figma` | `/design-export-figma` | Figma file/frame URL + export summary |
 
 Load `design-request-workflow` and `html-prototype-standards` rules for every phase.
 
@@ -62,7 +63,18 @@ Follow `design-iterate-feedback` skill:
 - Bump version and update changelog
 - Summarize changes
 
-Repeat Step 4 until designer marks ready for Figma polish or engineering handoff.
+Repeat Step 4 until designer marks the prototype approved for Figma export.
+
+### Step 5 — Export to Figma (when approved)
+
+Follow `design-export-figma` skill:
+- Require approved/stable HTML artifact path
+- Verify Figma MCP auth before export
+- Create new Figma frame/file or update existing file if `--figma-file-key` provided
+- Apply 390px mobile frame conventions and safe areas
+- Return Figma URL and export summary; append export record to companion notes
+
+**Checkpoint:** Confirm prototype is approved before export unless user explicitly runs `/design-export-figma`.
 
 ## Phase shortcuts
 
@@ -70,6 +82,7 @@ If the user invokes a single-phase command, run **only** that phase:
 - `/design-research` → Phase 1 only
 - `/design-prototype` → Phase 2 (use prior research or inline brief)
 - `/design-iterate` → Phase 3 (requires artifact path + feedback)
+- `/design-export-figma` → Phase 4 (requires approved artifact path; optional file key)
 
 ## Secondary capabilities
 
@@ -91,4 +104,4 @@ Do not default to Figma handoff-only flows.
 /design-request Mobile savings nudge at checkout — bottom sheet, show amount saved, dismissible, trust-focused copy. Target iOS/Android 390px.
 ```
 
-Expected flow: research summary → HTML prototype → pause for review → iterate on feedback.
+Expected flow: research summary → HTML prototype → pause for review → iterate on feedback → export to Figma when approved.

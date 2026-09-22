@@ -5,7 +5,7 @@ description: Kick off the full design request workflow — research, HTML canvas
 
 # Design request (full workflow)
 
-Start the **3-phase design request workflow** for a new mobile design request.
+Start the **4-phase design request workflow** for a new mobile design request.
 
 ## Usage
 
@@ -28,6 +28,7 @@ Or delegate to the **Design Request** agent with the same brief in chat.
 | 1 | Research | `design-request-research` | Research summary |
 | 2 | Prototype | `design-prototype-html` | HTML canvas artifact + notes |
 | 3 | Iterate | `design-iterate-feedback` | Updated artifact (when feedback provided) |
+| 4 | Export to Figma | `design-export-figma` | Figma file/frame URL (when approved) |
 
 ## Steps
 
@@ -37,6 +38,7 @@ Or delegate to the **Design Request** agent with the same brief in chat.
 4. **Prototype** — Self-contained mobile HTML per `html-prototype-standards`.
 5. **Review** — Share preview instructions; collect feedback.
 6. **Iterate** — Run `/design-iterate` or continue in same thread with feedback.
+7. **Export** — When approved, run `/design-export-figma <html-path>` to push into Figma.
 
 ## Rules & agent
 
@@ -48,4 +50,5 @@ Or delegate to the **Design Request** agent with the same brief in chat.
 - `/design-research` — research only
 - `/design-prototype` — prototype only
 - `/design-iterate` — apply feedback to existing artifact
+- `/design-export-figma` — export approved HTML to Figma
 - `/inspect-design` — Figma frame inspect (secondary research input)

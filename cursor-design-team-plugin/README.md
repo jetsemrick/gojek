@@ -5,7 +5,7 @@ Cursor plugin for the GoTo design team: **design request workflow** — research
 ## North star workflow
 
 ```text
-Design request → Research → HTML prototype → Iterate
+Design request → Research → HTML prototype → Iterate → Export to Figma
 ```
 
 | Phase | Command | Output |
@@ -13,20 +13,21 @@ Design request → Research → HTML prototype → Iterate
 | **Research** | `/design-research` | Inspiration & pattern summary |
 | **Prototype** | `/design-prototype` | Self-contained mobile HTML canvas artifact |
 | **Iterate** | `/design-iterate` | Updated artifact + changelog |
+| **Export to Figma** | `/design-export-figma` | Figma file/frame URL + export summary |
 
 Run the full flow (with checkpoints): `/design-request <brief>`
 
-**Design Request Agent** (`agents/design-request-agent.md`) orchestrates all three phases.
+**Design Request Agent** (`agents/design-request-agent.md`) orchestrates all four phases.
 
 ## What's included
 
 | Component | Purpose |
 | --- | --- |
-| **Agent** | `design-request` — orchestrates research → prototype → iterate |
-| **Skills** | `design-request-research`, `design-prototype-html`, `design-iterate-feedback` |
-| **Commands** | `/design-request`, `/design-research`, `/design-prototype`, `/design-iterate` |
+| **Agent** | `design-request` — orchestrates research → prototype → iterate → export |
+| **Skills** | `design-request-research`, `design-prototype-html`, `design-iterate-feedback`, `design-export-figma` |
+| **Commands** | `/design-request`, `/design-research`, `/design-prototype`, `/design-iterate`, `/design-export-figma` |
 | **Rules** | `design-request-workflow`, `html-prototype-standards`, mobile + designer conventions |
-| **Figma MCP** | Optional — inspect frames & summarize FigJam boards as **research inputs** |
+| **Figma MCP** | Required for Phase 4 export; optional for inspect & FigJam summary as **research inputs** |
 | **Legacy commands** | `/inspect-design`, `/figjam-summary` (secondary) |
 
 **MVP exclusions:** No design token sync, no `DESIGN_TOKEN_PATH`, no deep multi-file codegen.
@@ -36,7 +37,7 @@ Run the full flow (with checkpoints): `/design-request <brief>`
 Prototypes are **self-contained `.html` files** (inline CSS, vanilla JS) that designers preview in Cursor's **canvas / artifact** panel:
 
 - **390px** mobile viewport with safe-area insets
-- Semantic structure mappable to Figma frames later
+- Semantic structure mappable to Figma frames in Phase 4 export
 - Version comment in HTML + companion `*-notes.md` changelog
 
 Default paths: `prototypes/<slug>-v1.html` and `prototypes/<slug>-notes.md`.
@@ -44,13 +45,13 @@ Default paths: `prototypes/<slug>-v1.html` and `prototypes/<slug>-notes.md`.
 ## Prerequisites
 
 - [Cursor](https://cursor.com) with plugin / MCP support
-- Figma account (optional — only when using Figma/FigJam URLs in research)
+- Figma account and **Figma MCP auth** (required for Phase 4 export; optional for research inspect)
 
 ## Install (team marketplace)
 
 1. Team admin adds this repository to the **private team marketplace** in Cursor.
 2. Designers install **Design Team** from **Customize → Plugins** (team catalog).
-3. If using Figma/FigJam in research: **Plugins → Configure → Figma access token** (`FIGMA_ACCESS_TOKEN`).
+3. Configure **Figma access token** (`FIGMA_ACCESS_TOKEN`) for Phase 4 export and optional research inspect.
 4. Reload MCP if prompted.
 
 ## Local test (development)
@@ -69,6 +70,8 @@ Or phase by phase:
 /design-research Sticky CTA patterns for mobile checkout
 /design-prototype Savings nudge bottom sheet from research above
 /design-iterate prototypes/savings-nudge-v1.html — increase CTA tap target to 48px
+/design-export-figma prototypes/savings-nudge-v1.html
+/design-export-figma prototypes/savings-nudge-v1.html --figma-file-key abc123XYZ
 ```
 
 Secondary Figma flows (optional):
@@ -80,11 +83,11 @@ Secondary Figma flows (optional):
 
 ### Verify checklist
 
-- [ ] `.cursor-plugin/plugin.json` validates (name: `design-team`, version ≥ 0.2.0)
+- [ ] `.cursor-plugin/plugin.json` validates (name: `design-team`, version ≥ 0.3.0)
 - [ ] Agent `design-request` appears in subagent list
-- [ ] Commands `/design-request` through `/design-iterate` run without missing file errors
+- [ ] Commands `/design-request` through `/design-export-figma` run without missing file errors
 - [ ] HTML prototype follows `html-prototype-standards` (390px, safe areas)
-- [ ] Figma MCP connects when token configured (optional)
+- [ ] Figma MCP connects when token configured (required for export; optional for inspect)
 
 ## Configuration
 
@@ -92,9 +95,9 @@ Secondary Figma flows (optional):
 
 | Variable | Required | Where to set |
 | --- | --- | --- |
-| `FIGMA_ACCESS_TOKEN` | Optional* | Team marketplace **Plugins → Configure** |
+| `FIGMA_ACCESS_TOKEN` | Required for export* | Team marketplace **Plugins → Configure** |
 
-\*Required only when research includes Figma/FigJam MCP calls. HTML-only workflows need no token.
+\*Required for Phase 4 (`/design-export-figma`) and when research includes Figma/FigJam MCP calls. HTML-only research and prototype phases need no token.
 
 ```json
 {
@@ -119,7 +122,7 @@ Secondary Figma flows (optional):
 /design-request <problem, user, platform, must-haves>
 ```
 
-Agent runs research → prototype → pauses for review → iterate on feedback.
+Agent runs research → prototype → pauses for review → iterate on feedback → export to Figma when approved.
 
 ### Research only
 
@@ -138,6 +141,14 @@ Agent runs research → prototype → pauses for review → iterate on feedback.
 ```
 /design-iterate prototypes/<file>.html — <bullet feedback>
 ```
+
+### Export to Figma
+
+```
+/design-export-figma <html-path> [--figma-file-key <key>]
+```
+
+Export an **approved** HTML prototype to Figma as a 390px mobile frame. Omit `--figma-file-key` to create a new file/frame; provide it to add or update a frame in an existing file.
 
 ### Figma / FigJam (secondary research)
 
@@ -159,12 +170,14 @@ cursor-design-team-plugin/
 │   ├── design-request-research/
 │   ├── design-prototype-html/
 │   ├── design-iterate-feedback/
+│   ├── design-export-figma/
 │   └── figma-*/
 ├── commands/
 │   ├── design-request.md
 │   ├── design-research.md
 │   ├── design-prototype.md
 │   ├── design-iterate.md
+│   ├── design-export-figma.md
 │   └── inspect-design.md, figjam-summary.md
 ├── assets/logo.svg
 └── README.md
@@ -176,13 +189,13 @@ cursor-design-team-plugin/
 
 1. Push to org Git host.
 2. Add team marketplace entry in Cursor team settings.
-3. Smoke-test: one `/design-request` flow + one `/design-iterate` cycle.
+3. Smoke-test: one `/design-request` flow + one `/design-iterate` cycle + one `/design-export-figma` export.
 
 ## Support & open questions
 
 - **Web search:** Confirm team policy for external inspiration in research phase.
 - **Canvas artifacts:** Confirm HTML preview behavior in your Cursor build.
-- **Figma auth:** OAuth vs PAT for marketplace installs.
+- **Figma export:** Confirm MCP write capabilities (file creation, frame push) in your Cursor build; export may be approximate for complex CSS.
 - **Prototype paths:** Align on repo folder convention vs ephemeral artifacts.
 
 ## License
