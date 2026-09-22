@@ -6,29 +6,42 @@ Private Cursor plugin for GoTo's mobile design-request workflow:
 Design request → Research → HTML prototype → Iterate → Export to Figma
 ```
 
-`/design-request` is the sole orchestrator. It owns the checkpoints and the
-multi-turn feedback loop; the included `design-research-verifier` agent is
-limited to isolated source and assumption checks.
+This plugin is **skills-only**. The agent loads the appropriate skill based on
+user intent. `design-request` is the sole orchestrator for the full flow; the
+included `design-research-verifier` agent is limited to isolated source and
+assumption checks.
 
 ## Workflow
 
-| Stage | Command | Local skill | Output |
-| --- | --- | --- | --- |
-| Research | `/design-research` | `design-request-research` | Sourced pattern summary |
-| Prototype | `/design-prototype` | `design-prototype-html` | Self-contained mobile HTML + notes |
-| Iterate | `/design-iterate` | `design-iterate-feedback` | Updated HTML + changelog |
-| Export | `/design-export-figma` | `design-publish-figma` | Live browser capture + Figma URL |
+| Stage | Skill | Output |
+| --- | --- | --- |
+| Full flow | `design-request` | Checkpoints across all phases |
+| Research | `design-research` | Sourced pattern summary |
+| Prototype | `design-prototype` | Self-contained mobile HTML + notes |
+| Iterate | `design-iterate` | Updated HTML + changelog |
+| Export | `design-export-figma` | Live browser capture + Figma URL |
 
-Run all stages with checkpoints:
+Secondary skills:
+
+- `inspect-design` — mobile handoff notes from a Figma Design URL.
+- `figjam-summary` — decisions, themes, and action items from a FigJam board.
+
+## How to invoke
+
+Ask in natural language; Cursor loads the matching skill automatically. Examples:
 
 ```text
-/design-request <problem, user, platform, must-haves>
+Run a design request: mobile savings nudge at checkout — bottom sheet, dismissible, 390px
+Research sticky CTA patterns above the home indicator on iOS
+Prototype the login screen from the research summary — email, SSO, error state
+Iterate on prototypes/savings-nudge-v1.html — increase CTA target to 48px
+Export prototypes/savings-nudge-v1.html to Figma
+Inspect this Figma frame for mobile handoff: [URL]
+Summarize this FigJam board: [URL]
 ```
 
-Secondary commands:
-
-- `/inspect-design <figma-design-url>` — mobile handoff notes.
-- `/figjam-summary <figjam-url>` — decisions, themes, and action items.
+For the full workflow, start with a brief that mentions all phases or ask the
+agent to load `design-request`.
 
 ## Install from the private marketplace
 
@@ -53,7 +66,7 @@ This repository is a multi-plugin marketplace. The root
 
 The current Cursor plugin manifest does not support declaring another plugin as
 a dependency. Install order is therefore explicit: **Figma first (with OAuth),
-then use this plugin's Figma-dependent commands**. This plugin intentionally
+then use this plugin's Figma-dependent skills**. This plugin intentionally
 does not ship a Figma `mcp.json`, accept a personal-token variable, or copy
 Figma's official skills.
 
@@ -69,7 +82,7 @@ Evidence:
 
 ## Figma preflight
 
-Every command or skill that needs Figma must verify:
+Every skill that needs Figma must verify:
 
 1. Official `figma-use` and `figma-generate-design` skills are present.
 2. The required remote Figma tools are present; export specifically requires
@@ -96,12 +109,9 @@ through a local browser server; the export workflow uses that same fallback.
 
 ## Export HTML to Figma
 
-```text
-/design-export-figma prototypes/savings-nudge-v1.html
-/design-export-figma prototypes/login-v1.html --figma-file-key abc123XYZ
-```
-
-Export uses Figma's remote-only `generate_figma_design` code-to-canvas tool:
+Load `design-export-figma` when the user asks to export or capture an approved
+HTML prototype into Figma. Export uses Figma's remote-only
+`generate_figma_design` code-to-canvas tool:
 
 1. Validate the approved HTML and companion notes.
 2. Serve the artifact at a verified `http://localhost:<port>/...` URL.
@@ -133,18 +143,10 @@ manual screenshot and structure/spec import.
    `~/.cursor/plugins/local/design-team` (copy it; external symlink targets are
    not loaded).
 2. Run **Developer: Reload Window**.
-3. Confirm commands, skills, rules, and the `design-research-verifier` agent
-   appear in Customize.
+3. Confirm skills, rules, and the `design-research-verifier` agent appear in
+   Customize.
 4. Install/authenticate the official Figma plugin separately if testing Figma
    paths.
-
-Try:
-
-```text
-/design-request Mobile savings nudge — checkout bottom sheet, dismissible, 390px
-/design-iterate prototypes/savings-nudge-v1.html — increase CTA target to 48px
-/design-export-figma prototypes/savings-nudge-v1.html
-```
 
 ## Validation
 
@@ -157,8 +159,9 @@ npm run validate:plugin
 The validator checks:
 
 - plugin and marketplace manifest shape/version/path
-- required commands, skills, agent, rules, logo, and marketplace entry
-- unique command/agent/skill names across component types
+- required skills, agent, rules, logo, and marketplace entry
+- skills-only packaging (no command components)
+- unique agent/skill names
 - stale or forbidden references, PAT/Bearer config, and duplicate Figma MCP
 - required Figma preflight and browser-capture documentation
 
@@ -177,15 +180,16 @@ Manual smoke tests still required before rollout:
 cursor-design-team-plugin/
 ├── .cursor-plugin/plugin.json
 ├── agents/design-research-verifier.md
-├── commands/
 ├── prototypes/          # HTML artifacts + notes (see _template-* starters)
 ├── rules/
 ├── skills/
-│   ├── design-request-research/
-│   ├── design-prototype-html/
-│   ├── design-iterate-feedback/
-│   ├── design-publish-figma/
-│   └── figma-inspect-handoff/
+│   ├── design-request/
+│   ├── design-research/
+│   ├── design-prototype/
+│   ├── design-iterate/
+│   ├── design-export-figma/
+│   ├── inspect-design/
+│   └── figjam-summary/
 ├── scripts/validate-plugin.mjs
 └── assets/logo.svg
 ```

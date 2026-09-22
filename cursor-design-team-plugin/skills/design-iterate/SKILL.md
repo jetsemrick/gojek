@@ -1,14 +1,16 @@
 ---
-name: design-iterate-feedback
-description: Incorporate designer, engineer, and user feedback to refine an HTML canvas prototype. Use for Phase 3 of the design request workflow or when /design-iterate is invoked.
+name: design-iterate
+description: Apply feedback to refine an HTML canvas prototype — Phase 3 of the design request workflow. Load when the user provides feedback on an existing prototype.
 ---
 
 # Design iterate (feedback)
 
+Run **Phase 3 (Iterate)** — incorporate feedback and update the HTML prototype.
+
 ## When to use
 
 - An HTML prototype exists and feedback has arrived.
-- User runs `/design-iterate` or Phase 3 of `/design-request`.
+- Phase 3 of `design-request`, or the user asks to iterate/refine a prototype.
 - Designer wants a revised canvas artifact with tracked changes.
 
 Primary output is an **updated HTML file** plus **changelog entry**.
@@ -26,6 +28,8 @@ Optional:
 If artifact path is missing, ask once. If feedback is empty, ask what to change.
 
 ## Workflow
+
+Load `html-prototype-standards` rule.
 
 ### 1. Load current artifact
 
@@ -89,7 +93,7 @@ Return short summary:
 
 ## Example prompts
 
-- `/design-iterate prototypes/login-v1.html — CTA should be sticky; add "Forgot password?" link; error state for empty email.`
+- "Iterate on prototypes/login-v1.html — CTA should be sticky; add forgot password link; error state for empty email."
 - "Designers said headline is too long — shorten and bump spacing above the form."
 - "Engineering feedback: use semantic button types and aria labels on the sheet close control."
 
@@ -98,3 +102,8 @@ Return short summary:
 - Discard prior changelog history.
 - Apply feedback that breaks mobile viewport without noting the tradeoff.
 - Start research or unrelated new screens in this phase — scope to the existing artifact unless user expands.
+
+## Related
+
+- Full flow: `design-request`
+- New request: `design-research` or `design-request`

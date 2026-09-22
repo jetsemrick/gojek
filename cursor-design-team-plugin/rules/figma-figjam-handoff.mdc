@@ -23,7 +23,7 @@ Figma URLs encode node IDs with hyphens (e.g. `123-456`). MCP tools often expect
 
 For inspect calls, pass the **file key + node id** to the official Figma tools.
 For HTML export, use the separate localhost browser-capture workflow in
-`design-publish-figma`.
+`design-export-figma`.
 
 ## Route by file type
 

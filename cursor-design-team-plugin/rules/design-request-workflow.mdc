@@ -18,13 +18,13 @@ optional export stage captures the approved HTML artifact into Figma.
 
 | User signal | Stage | Action |
 | --- | --- | --- |
-| New brief, "design request", `/design-request` | Full workflow | `/design-request` command owns all stages and checkpoints |
-| "Research", "inspiration", `/design-research` | Research | `design-request-research` skill |
-| "Prototype", "HTML", "canvas", `/design-prototype` | Prototype | `design-prototype-html` skill + `html-prototype-standards` |
-| Feedback on existing HTML, `/design-iterate` | Iterate | `design-iterate-feedback` skill |
-| "Export to Figma", "push to Figma", approved HTML, `/design-export-figma` | Export | `design-publish-figma` skill (requires official Figma plugin + OAuth) |
-| Figma frame URL + "inspect" only | Secondary | `inspect-design` / `figma-inspect-handoff` |
-| FigJam URL + "summarize" only | Secondary | `figjam-summary` |
+| New brief, "design request" | Full workflow | Load `design-request` skill |
+| "Research", "inspiration" | Research | Load `design-research` skill |
+| "Prototype", "HTML", "canvas" | Prototype | Load `design-prototype` skill + `html-prototype-standards` |
+| Feedback on existing HTML | Iterate | Load `design-iterate` skill |
+| "Export to Figma", "push to Figma", approved HTML | Export | Load `design-export-figma` skill (requires official Figma plugin + OAuth) |
+| Figma frame URL + "inspect" only | Secondary | Load `inspect-design` skill |
+| FigJam URL + "summarize" only | Secondary | Load `figjam-summary` skill |
 
 ## Stage inputs and outputs
 
@@ -59,8 +59,8 @@ optional export stage captures the approved HTML artifact into Figma.
 ## Checkpoints
 
 - After research: confirm before prototype unless user said "run all phases."
-- After prototype: invite review; suggest `/design-iterate` with feedback bullets.
-- After iterate: list deferred items and current version number; offer `/design-export-figma` when approved.
+- After prototype: invite review; suggest loading `design-iterate` with feedback bullets.
+- After iterate: list deferred items and current version number; offer `design-export-figma` when approved.
 - After export: return the exact Figma URL and note capture limitations.
 
 ## Figma preflight

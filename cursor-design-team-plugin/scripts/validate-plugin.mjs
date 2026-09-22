@@ -49,10 +49,9 @@ const requiredFiles = [
   "cursor-design-team-plugin/README.md",
   "cursor-design-team-plugin/assets/logo.svg",
   "cursor-design-team-plugin/agents/design-research-verifier.md",
-  "cursor-design-team-plugin/commands/design-request.md",
-  "cursor-design-team-plugin/commands/design-export-figma.md",
-  "cursor-design-team-plugin/skills/design-publish-figma/SKILL.md",
-  "cursor-design-team-plugin/skills/figma-inspect-handoff/SKILL.md",
+  "cursor-design-team-plugin/skills/design-request/SKILL.md",
+  "cursor-design-team-plugin/skills/design-export-figma/SKILL.md",
+  "cursor-design-team-plugin/skills/inspect-design/SKILL.md",
 ];
 
 for (const file of requiredFiles) {
@@ -171,10 +170,19 @@ if (marketplace.metadata?.version !== manifest.version) {
   fail("marketplace metadata.version and plugin version must match");
 }
 
-const components = {
-  command: walk(join(pluginRoot, "commands")).filter((path) =>
+const commandsDir = join(pluginRoot, "commands");
+if (existsSync(commandsDir)) {
+  const commandFiles = walk(commandsDir).filter((path) =>
     /\.(md|mdc|markdown|txt)$/.test(path),
-  ),
+  );
+  if (commandFiles.length > 0) {
+    fail(
+      `Plugin uses skills-only packaging; remove commands: ${commandFiles.map((path) => relative(repoRoot, path)).join(", ")}`,
+    );
+  }
+}
+
+const components = {
   agent: walk(join(pluginRoot, "agents")).filter((path) =>
     /\.(md|mdc|markdown)$/.test(path),
   ),
@@ -212,7 +220,8 @@ for (const [type, files] of Object.entries(components)) {
 }
 
 const expectedNames = {
-  command: [
+  agent: ["design-research-verifier"],
+  skill: [
     "design-request",
     "design-research",
     "design-prototype",
@@ -220,14 +229,6 @@ const expectedNames = {
     "design-export-figma",
     "inspect-design",
     "figjam-summary",
-  ],
-  agent: ["design-research-verifier"],
-  skill: [
-    "design-request-research",
-    "design-prototype-html",
-    "design-iterate-feedback",
-    "design-publish-figma",
-    "figma-inspect-handoff",
   ],
 };
 
@@ -246,7 +247,12 @@ for (const [type, expected] of Object.entries(expectedNames)) {
 const forbiddenFiles = [
   "cursor-design-team-plugin/mcp.json",
   "cursor-design-team-plugin/agents/design-request-agent.md",
-  "cursor-design-team-plugin/skills/design-export-figma/SKILL.md",
+  "cursor-design-team-plugin/commands/design-request.md",
+  "cursor-design-team-plugin/skills/design-publish-figma/SKILL.md",
+  "cursor-design-team-plugin/skills/design-request-research/SKILL.md",
+  "cursor-design-team-plugin/skills/design-prototype-html/SKILL.md",
+  "cursor-design-team-plugin/skills/design-iterate-feedback/SKILL.md",
+  "cursor-design-team-plugin/skills/figma-inspect-handoff/SKILL.md",
   "cursor-design-team-plugin/skills/figma-design-to-code/SKILL.md",
   "cursor-design-team-plugin/skills/figma-code-connect/SKILL.md",
 ];
@@ -266,6 +272,11 @@ const forbiddenText = [
   ["figma-design-to-code", "bundled official-skill lookalike reference"],
   ["figma-code-connect", "bundled official-skill lookalike reference"],
   ["design-request-agent", "stale agent reference"],
+  ["design-request-research", "stale skill reference"],
+  ["design-prototype-html", "stale skill reference"],
+  ["design-iterate-feedback", "stale skill reference"],
+  ["design-publish-figma", "stale skill reference"],
+  ["figma-inspect-handoff", "stale skill reference"],
 ];
 for (const [needle, label] of forbiddenText) {
   if (allText.includes(needle)) fail(`${label} remains: ${needle}`);
@@ -273,23 +284,17 @@ for (const [needle, label] of forbiddenText) {
 if (/\b(?:three[- ]phase|all three with checkpoints)\b/i.test(allText)) {
   fail("Stale three-phase workflow wording remains");
 }
+if (
+  /(?:^|[\s])\/design-(?:request|research|prototype|iterate|export-figma)(?:\s|$|[<`—])/.test(
+    allText,
+  )
+) {
+  fail("Stale slash-command references remain; plugin is skills-only");
+}
 
 const requiredContent = [
   [
-    "commands/design-export-figma.md",
-    [
-      "/add-plugin figma",
-      "OAuth",
-      "generate_figma_design",
-      "localhost",
-      "Full seat",
-      "edit permission",
-      "use_figma",
-      "Figma URL",
-    ],
-  ],
-  [
-    "skills/design-publish-figma/SKILL.md",
+    "skills/design-export-figma/SKILL.md",
     [
       "/add-plugin figma",
       "OAuth",
@@ -310,6 +315,7 @@ const requiredContent = [
       "generate_figma_design",
       "plugin manifest does not support",
       ".cursor-plugin/marketplace.json",
+      "skills-only",
     ],
   ],
 ];

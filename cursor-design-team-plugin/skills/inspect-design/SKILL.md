@@ -1,15 +1,18 @@
 ---
-name: figma-inspect-handoff
-description: Secondary research input — inspect Figma frames and produce mobile handoff notes. Use during design-request research when team Figma URLs are provided, not as the primary prototype deliverable.
+name: inspect-design
+description: Inspect a Figma frame or layer and produce mobile-friendly handoff notes. Load when the user provides a Figma Design URL for inspect, spec, or handoff.
 ---
 
-# Figma inspect & handoff
+# Inspect design
+
+Inspect a **Figma Design** frame or layer and produce structured handoff documentation optimized for **mobile** development.
 
 ## When to use
 
 - Designer asks to **inspect**, **spec**, or **hand off** a Figma frame or component.
 - Preparing **mobile** dev handoff (React Native, SwiftUI, Android).
 - **Design review** — spacing, accessibility, consistency checks.
+- Secondary research input during `design-research`.
 
 Primary output is **documentation**, not code.
 
@@ -30,7 +33,8 @@ Figma access comes from Figma's official Cursor plugin.
 
 ### 1. Accept the Figma URL
 
-Required: link with `node-id` query param. If missing, ask the designer to:
+Required: link with `node-id` query param. Parse file key and node id; normalize
+id for MCP (`-` → `:`). If missing, ask the designer to:
 
 1. Select the frame in Figma
 2. Right-click → **Copy link to selection**
@@ -38,6 +42,8 @@ Required: link with `node-id` query param. If missing, ask the designer to:
 ### 2. Retrieve context via Figma MCP
 
 Call appropriate MCP tools for the node. Prefer structured design context over screenshots alone.
+
+Apply `mobile-design-handoff` and `figma-figjam-handoff` rules.
 
 ### 3. Produce handoff document
 
@@ -96,6 +102,22 @@ If the designer asks for **review** rather than specs, add:
 - **Consistency** — alignment to nearby screens in file if context available
 - **States** — missing hover/pressed/disabled/error
 - **Content** — placeholder vs final copy
+
+## Output expectations
+
+- Designer-readable language (not raw MCP JSON).
+- Mobile assumptions stated explicitly (device size, safe areas).
+- **No code** unless the user also asks for implementation.
+- Flag missing states or ambiguous interactions.
+
+## Troubleshooting
+
+| Issue | Action |
+| --- | --- |
+| Missing `node-id` | Ask designer to copy link to selection |
+| Official plugin missing | Run `/add-plugin figma`, reload Cursor, and retry |
+| MCP auth error | Authenticate with Figma OAuth from Customize → Plugins → Figma |
+| Wrong file type (FigJam) | Load `figjam-summary` instead |
 
 ## Example prompts
 

@@ -9,25 +9,25 @@ This plugin is for **designers**. The primary flow is **design request → resea
 
 ## Primary workflow
 
-| Step | Command / agent | Output |
+| Step | Skill | Output |
 | --- | --- | --- |
-| 1. Research | `/design-research` | Inspiration & pattern summary |
-| 2. Prototype | `/design-prototype` | Mobile HTML canvas artifact |
-| 3. Iterate | `/design-iterate` | Updated artifact + changelog |
-| 4. Export (optional) | `/design-export-figma` | Captured Figma Design URL |
+| 1. Research | `design-research` | Inspiration & pattern summary |
+| 2. Prototype | `design-prototype` | Mobile HTML canvas artifact |
+| 3. Iterate | `design-iterate` | Updated artifact + changelog |
+| 4. Export (optional) | `design-export-figma` | Captured Figma Design URL |
 
-Run the complete workflow with checkpoints: `/design-request <brief>`.
-`/design-request` is the sole orchestrator.
+Run the complete workflow with checkpoints: load `design-request` with a brief.
+`design-request` is the sole orchestrator.
 
 ## Secondary capabilities (Figma / FigJam)
 
 | Designer intent | Use |
 | --- | --- |
-| Existing team frame specs | `/inspect-design` or `figma-inspect-handoff` skill |
-| Workshop board summary | `/figjam-summary` |
+| Existing team frame specs | `inspect-design` skill |
+| Workshop board summary | `figjam-summary` skill |
 | Verify public/mobile research | `design-research-verifier` agent |
 | Figma skills or Code Connect | Official Figma plugin (`/add-plugin figma`) |
-| Capture approved HTML | `design-publish-figma` skill through `/design-export-figma` |
+| Capture approved HTML | `design-export-figma` skill |
 
 Use Figma/FigJam during **research** when URLs are available — not as a substitute for HTML prototypes.
 Do not bundle copies of official Figma skills.
@@ -60,8 +60,8 @@ Do not bundle copies of official Figma skills.
 
 ## Example prompts (designer-friendly)
 
-- `/design-request Mobile savings nudge at checkout — bottom sheet, trust copy, 390px`
-- `/design-research Sticky CTA patterns above home indicator on iOS`
-- `/design-prototype Login screen from research — email, SSO, error state`
-- `/design-iterate prototypes/login-v1.html — shorten headline, add forgot password link`
+- "Design request: mobile savings nudge at checkout — bottom sheet, trust copy, 390px"
+- "Research sticky CTA patterns above home indicator on iOS"
+- "Prototype the login screen from research — email, SSO, error state"
+- "Iterate on prototypes/login-v1.html — shorten headline, add forgot password link"
 - "Inspect our existing login frame for reference: [Figma URL]" (secondary)

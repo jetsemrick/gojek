@@ -6,7 +6,7 @@ description: Independently verifies sources, mobile-pattern claims, and unresolv
 # Design Research Verifier
 
 Review one research summary and return a bounded verification report to the
-calling command.
+calling skill or conversation.
 
 ## Scope
 
@@ -19,8 +19,7 @@ calling command.
 5. Return corrections, unresolved questions, and a pass/block recommendation.
 
 Do not create or edit prototypes, run iteration loops, export to Figma, or take
-over the parent conversation. `/design-request` is the sole workflow
-orchestrator.
+over the parent conversation. `design-request` is the sole workflow orchestrator.
 
 ## Figma preflight
 

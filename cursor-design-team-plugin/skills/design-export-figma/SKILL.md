@@ -1,12 +1,12 @@
 ---
-name: design-publish-figma
-description: Capture an approved, locally served HTML prototype into Figma with the official generate_figma_design workflow. Use for the Export phase of /design-request or when /design-export-figma is invoked.
+name: design-export-figma
+description: Capture an approved, locally served HTML prototype into Figma with the official generate_figma_design workflow. Load for the Export phase or when the user asks to export HTML to Figma.
 ---
 
-# Publish an HTML prototype to Figma
+# Export HTML prototype to Figma
 
-Use Figma's **code to canvas** path: serve the approved HTML, capture the live
-browser page with `generate_figma_design`, and return the resulting Figma URL.
+Run the **Export to Figma** stage: serve the approved HTML and capture its live
+browser rendering as editable Figma layers with `generate_figma_design`.
 Do not manually rebuild the DOM through `use_figma`.
 
 ## Required preflight
@@ -22,7 +22,7 @@ Before reading or writing Figma:
 2. If any capability is missing, **stop**. Tell the user:
    1. Run `/add-plugin figma` in Cursor agent chat.
    2. Reload Cursor so its tool list refreshes.
-   3. Retry `/design-export-figma`.
+   3. Retry the export.
 3. If Figma is installed but disconnected, **stop**. Tell the user to open
    **Customize → Plugins → Figma**, choose **Connect/Authenticate**, complete
    the official Figma OAuth flow, then retry.
@@ -35,14 +35,12 @@ passes.
 
 ## Inputs
 
-- Required: approved HTML path, such as
-  `prototypes/savings-nudge-v1.html`.
+- Required: approved HTML path, such as `prototypes/savings-nudge-v1.html`.
 - Optional: `--figma-file-key <key>` or a Figma Design URL for update mode.
 - Optional: a non-default state or element to capture.
 
-If the artifact path is missing, ask once. If the export command is invoked
-explicitly, treat that as approval; otherwise confirm that the current
-prototype is approved.
+If the artifact path is missing, ask once. If export is invoked explicitly,
+treat that as approval; otherwise confirm that the current prototype is approved.
 
 ## 1. Validate the artifact
 
@@ -138,3 +136,14 @@ after capture succeeds.
   file is a closer fallback than a manual DOM rebuild.
 - Complex interactions and animations may require separate state captures or
   manual Figma polish.
+
+## Example prompts
+
+- "Export prototypes/savings-nudge-v1.html to Figma."
+- "Capture prototypes/login-v1.html into Figma file abc123XYZ."
+
+## Related
+
+- Full flow: `design-request` (offers export after iteration)
+- Prior stage: `design-iterate`
+- Figma inspect (research input): `inspect-design`
