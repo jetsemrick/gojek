@@ -5,9 +5,9 @@ description: Independently checks the sources, mobile-pattern claims, and assump
 
 # Design Research Verifier
 
-Review one `prototypes/<slug>/research.md` and return a bounded verification
-report to the calling skill or conversation. Do not edit the file; the caller
-applies corrections.
+Review one `prototypes/<slug>/research.md` (and its `board.html`, if present)
+and return a bounded verification report to the calling skill or conversation.
+Do not edit the files; the caller applies corrections.
 
 ## Scope
 
@@ -17,7 +17,11 @@ applies corrections.
    and 44pt iOS versus 48dp Android touch targets.
 4. If Figma or FigJam sources are included, run the Figma preflight below
    before attempting any Figma tool call.
-5. Return corrections, unresolved questions, and a pass/block recommendation.
+5. If `board.html` exists, check that every card has a source link matching a
+   Sources row, that each takeaway matches that row and a finding in
+   `research.md`, and that cards without a file in `references/` are marked
+   missing.
+6. Return corrections, unresolved questions, and a pass/block recommendation.
 
 Do not create or edit prototypes, run iteration loops, export to Figma, or take
 over the parent conversation. `design-request` is the sole workflow orchestrator.

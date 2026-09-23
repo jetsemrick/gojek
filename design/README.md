@@ -1,6 +1,6 @@
 # Design Cursor Plugin
 
-Private Cursor plugin for GoTo's mobile design-request workflow (v0.7.0):
+Private Cursor plugin for GoTo's mobile design-request workflow (v0.8.0):
 
 ```text
 Brief → Research + Prototype (one turn) → Iterate → Export to Figma
@@ -14,7 +14,7 @@ flow. The `design-research-verifier` agent only runs isolated source checks.
 
 | Phase | Skill | Writes to `prototypes/<slug>/` |
 | --- | --- | --- |
-| Research | `design-research` | `research.md` with a sources table |
+| Research | `design-research` | `research.md` with a sources table, `references/` screenshots, `board.html` |
 | Prototype | `design-prototype` | `index.html`, `notes.md`, `feedback.md`, `history/1.0.0.html` |
 | Iterate | `design-iterate` | Feedback rows, updated `index.html`, `history/<version>.html`, changelog |
 | Export to Figma | `design-export-figma` | Per-state Figma links in the `notes.md` export record |
@@ -26,14 +26,33 @@ Secondary skills: `inspect-design` (Figma Design frame → handoff notes) and
 
 A new brief gets research **and** a clickable prototype in one turn, with one
 checkpoint at the end. Say "research first" to add a checkpoint after
-`research.md`. Every phase ends with numbered options, so a designer can reply
-`1`, `2`, or describe what they want.
+`research.md` and the board. Every phase ends with numbered options, so a
+designer can reply `1`, `2`, or describe what they want.
+
+### Research board
+
+Every research run, compact or full, also produces a visual board.
+`design-research` captures screenshots of the comparable apps and patterns it
+cites (app store listings, help and press pages; competitor screenshots are
+allowed) into `references/`, then builds `board.html` from
+`skills/design-research/templates/board.html`:
+
+- cards grouped by theme, each with the screenshot, app name, a takeaway tied
+  to a finding in `research.md`, and the source link;
+- a closing section with the recommended starter and states;
+- a smaller board in compact mode (three to six cards) than in full mode.
+
+If a screenshot cannot be captured, the card keeps its source link and is
+marked "Screenshot not captured"; the board still renders. Preview follows the
+same Canvas-first rule as prototypes.
 
 ### One folder per request
 
 ```text
 prototypes/<slug>/
 ├── research.md          # sources, patterns, recommended starter and states
+├── board.html           # visual research board: screenshots by theme, starter and states
+├── references/          # screenshots cited on the board
 ├── index.html           # current prototype
 ├── notes.md             # version, states table, changelog, Figma export record
 ├── feedback.md          # ID · date · source · feedback · priority · status · version
@@ -84,11 +103,12 @@ Each starter is one self-contained HTML file with:
 
 ## Preview: Canvas first
 
-The agent shows `prototypes/<slug>/index.html` in Cursor's Canvas preview. If
-Canvas cannot render it, the fallback is a local server rooted at the request
-folder (`npx --yes serve -l <port> prototypes/<slug>` or
-`python3 -m http.server`) opened in Cursor's browser. Export always uses a
-local server.
+The agent shows `prototypes/<slug>/board.html` and
+`prototypes/<slug>/index.html` in Cursor's Canvas preview. If Canvas cannot
+render them (or, for the board, load the `references/` images), the fallback is
+a local server rooted at the request folder
+(`npx --yes serve -l <port> prototypes/<slug>` or `python3 -m http.server`)
+opened in Cursor's browser. Export always uses a local server.
 
 ## Export to Figma
 
@@ -164,11 +184,13 @@ npm run validate:plugin
 The validator checks the manifests and versions, skills-only packaging, unique
 names, trigger descriptions (length, "Not for" clauses, export routing),
 narrow rule globs, starter templates (frame, `?state=`, capture mode, sheet
-accessibility), request-folder guidance, and forbidden auth or stale
-references.
+accessibility), the research board template (self-contained, `references/`
+images, missing-screenshot marker, recommended starter and states),
+request-folder guidance, and forbidden auth or stale references.
 
 Manual checks still needed before rollout: marketplace install from `main`,
-Canvas preview in the team's Cursor build, trigger routing against the official
+Canvas preview in the team's Cursor build (including board screenshots from
+`references/`), trigger routing against the official
 Figma plugin, missing-plugin and OAuth stop paths, one multi-state export into a
 designer-linked file, and a permission denial.
 
@@ -182,7 +204,7 @@ design/
 ├── rules/
 ├── skills/
 │   ├── design-request/
-│   ├── design-research/        # templates/research.md
+│   ├── design-research/        # templates/research.md, templates/board.html
 │   ├── design-prototype/       # templates/*.html, templates/notes.md
 │   ├── design-iterate/         # templates/feedback.md
 │   ├── design-export-figma/

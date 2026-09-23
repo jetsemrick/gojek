@@ -15,6 +15,8 @@ Every request lives in one folder. Create it on intake; read it on resume.
 ```text
 prototypes/<slug>/
 ├── research.md          # sources, patterns, recommended starter and states
+├── board.html           # visual research board: screenshots by theme, starter and states
+├── references/          # screenshots cited on the board, e.g. references/01-app-screen.png
 ├── index.html           # current prototype (always the latest version)
 ├── notes.md             # version, states table, changelog, Figma export record
 ├── feedback.md          # feedback log: ID, source, priority, status
@@ -28,8 +30,8 @@ prototypes/<slug>/
 ## Resume ("continue <slug>")
 
 Read `notes.md`, `feedback.md`, and `research.md`. Reply with the current
-version, open feedback IDs, and the last Figma export (if any), then offer the
-numbered options for the phase it is in.
+version, open feedback IDs, the last Figma export (if any), and a link to
+`board.html`, then offer the numbered options for the phase it is in.
 
 ## Fast path (default)
 
@@ -39,12 +41,15 @@ Run research and prototype in **one turn** with a single checkpoint at the end.
    screen or flow to build. Ask one clarifying question only if the brief has no
    identifiable screen or goal; otherwise state assumptions and continue.
 2. **Research.** Follow `design-research` in compact mode. Write
-   `prototypes/<slug>/research.md`.
+   `prototypes/<slug>/research.md`, capture screenshots into `references/`,
+   and build a compact `board.html`.
 3. **Prototype.** Follow `design-prototype`. Copy the recommended starter,
    write `index.html`, `notes.md`, `feedback.md`, and `history/1.0.0.html`.
-4. **Preview.** Canvas first, local server as fallback (see `design-prototype`).
-5. **Checkpoint.** Summarize research in three bullets or fewer, list states,
-   note assumptions, then end with the prototype options below.
+4. **Preview.** Canvas first, local server as fallback, for `board.html` (see
+   `design-research`) and then `index.html` (see `design-prototype`).
+5. **Checkpoint.** Summarize research in three bullets or fewer, link
+   `board.html` (note any screenshots marked missing), list states, note
+   assumptions, then end with the prototype options below.
 
 If the official Figma plugin tools are not in your tool list, add one line at
 the checkpoint: export will need `/add-plugin figma` and OAuth. Do not block.
@@ -52,7 +57,8 @@ the checkpoint: export will need `/add-plugin figma` and OAuth. Do not block.
 ### Research first (opt-in)
 
 If the designer says "research first", "just research", "don't build yet", or
-the brief is high-stakes and ambiguous, stop after `research.md` and end with:
+the brief is high-stakes and ambiguous, stop after `research.md` and a full
+`board.html`. Preview the board, summarize the themes, and end with:
 
 ```text
 1. Build the prototype with the <starter> starter
@@ -97,7 +103,7 @@ and iteration keep working.
 ## Optional verifier
 
 For high-stakes or weakly sourced research, the `design-research-verifier`
-agent can check `research.md` once and return a report. It does not edit
+agent can check `research.md` and `board.html` once and return a report. It does not edit
 files or run later phases.
 
 ## Example prompts

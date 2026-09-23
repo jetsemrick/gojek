@@ -59,6 +59,7 @@ const requiredFiles = [
   "design/skills/inspect-design/SKILL.md",
   "design/skills/design-prototype/templates/notes.md",
   "design/skills/design-research/templates/research.md",
+  "design/skills/design-research/templates/board.html",
   "design/skills/design-iterate/templates/feedback.md",
 ];
 
@@ -350,11 +351,34 @@ const requiredContent = [
       "Research first",
       "Numbered options",
       "continue <slug>",
+      "board.html",
+      "references/",
     ],
   ],
   [
     "skills/design-research/SKILL.md",
-    ["prototypes/<slug>/research.md", "templates/research.md", "Sources"],
+    [
+      "prototypes/<slug>/research.md",
+      "templates/research.md",
+      "Sources",
+      "prototypes/<slug>/references/",
+      "prototypes/<slug>/board.html",
+      "templates/board.html",
+      "Compact",
+      "Full",
+      "Canvas",
+      "npx --yes serve",
+      "data-missing",
+      "Competitor screenshots are allowed",
+    ],
+  ],
+  [
+    "skills/design-research/templates/research.md",
+    ["board.html", "references/", "Screenshot"],
+  ],
+  [
+    "rules/design-request-workflow.mdc",
+    ["board.html", "references/"],
   ],
   [
     "skills/design-prototype/SKILL.md",
@@ -382,6 +406,8 @@ const requiredContent = [
       "skills-only",
       "**`main`**",
       "prototypes/<slug>/",
+      "board.html",
+      "references/",
     ],
   ],
 ];
@@ -455,6 +481,32 @@ for (const starter of starterTemplates) {
     if (/class="backdrop"[^>]*\shidden/.test(html)) {
       fail(`${label} backdrop uses hidden, which blocks the fade transition`);
     }
+  }
+}
+
+const boardPath = join(pluginRoot, "skills", "design-research", "templates", "board.html");
+if (existsSync(boardPath)) {
+  const html = read(boardPath);
+  const label = "design-research/templates/board.html";
+  for (const needle of [
+    'href="research.md"',
+    'src="references/',
+    'class="theme"',
+    'class="card"',
+    'class="takeaway"',
+    'class="finding"',
+    'class="source"',
+    "data-missing",
+    "Screenshot not captured",
+    'addEventListener("error"',
+    "Recommended prototype",
+    "Starter",
+    "States",
+  ]) {
+    if (!html.includes(needle)) fail(`${label} is missing ${needle}`);
+  }
+  if (/<script[^>]+src=|<link[^>]+href=|@import|url\(\s*["']?https?:/.test(html)) {
+    fail(`${label} must be self-contained (no external scripts, stylesheets, or fonts)`);
   }
 }
 

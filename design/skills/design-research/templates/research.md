@@ -5,6 +5,7 @@
 **Platform:** Mobile — iOS / Android / cross-platform
 **Date:** YYYY-MM-DD
 **Mode:** Fast path | Research first
+**Board:** [board.html](board.html) — screenshots in `references/`
 
 ## Problem and goals
 
@@ -36,7 +37,8 @@
 ## Sources
 
 Every takeaway above must trace to a row here or be labelled as an assumption.
+Row numbers match the board cards and the `references/<nn>-…` file names.
 
-| # | Source | Type | Takeaway | Accessed |
-| --- | --- | --- | --- | --- |
-| 1 | [Name](https://example.com) | App / design system / article / Figma / FigJam | ... | YYYY-MM-DD |
+| # | Source | Type | Takeaway | Screenshot | Accessed |
+| --- | --- | --- | --- | --- | --- |
+| 1 | [Name](https://example.com) | App store / help page / press / design system / article / Figma / FigJam | ... | `references/01-app-screen.png` or not captured | YYYY-MM-DD |

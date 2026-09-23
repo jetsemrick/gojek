@@ -1,13 +1,14 @@
 ---
 description: Conventions for design-request HTML prototypes in prototypes/<slug>/ — fixed 390×844 frame, ?state= states, capture mode, safe areas, touch targets, versioning.
 alwaysApply: false
-globs: ["**/prototypes/**/*.html"]
+globs: ["**/prototypes/**/index.html", "**/prototypes/**/history/*.html"]
 ---
 
 # HTML prototype standards
 
 Apply when creating or editing `prototypes/<slug>/index.html`. Starters live
-in the `design-prototype` skill's `templates/` folder.
+in the `design-prototype` skill's `templates/` folder. The research board
+(`board.html`) is not a prototype; it follows `design-research`.
 
 ## File
 

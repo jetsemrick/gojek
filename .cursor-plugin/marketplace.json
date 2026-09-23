@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "GoTo team marketplace of private Cursor plugins",
-    "version": "0.7.0"
+    "version": "0.8.0"
   },
   "plugins": [
     {
       "name": "design",
       "source": "design",
       "description": "Research, prototype, iterate, and export mobile design requests.",
-      "version": "0.7.0"
+      "version": "0.8.0"
     }
   ]
 }

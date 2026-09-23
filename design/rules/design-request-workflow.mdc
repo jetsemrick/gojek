@@ -26,6 +26,8 @@ Brief → Research + Prototype (one turn) → Iterate → Export to Figma
 ```text
 prototypes/<slug>/
 ├── research.md       # sources and recommended starter/states
+├── board.html        # visual research board: screenshots by theme, starter and states
+├── references/       # screenshots cited on the board
 ├── index.html        # current prototype
 ├── notes.md          # version, states table, changelog, Figma export record
 ├── feedback.md       # ID · date · source · feedback · priority · status · version
@@ -38,14 +40,17 @@ deleted afterwards.
 ## Checkpoints
 
 - **Fast path (default):** one checkpoint after the prototype.
-- **Research first (opt-in):** an extra checkpoint after `research.md`.
+- **Research first (opt-in):** an extra checkpoint after `research.md` and
+  `board.html`.
+- Every research run, compact or full, writes `board.html`; missing
+  screenshots are marked on their cards, never a reason to skip the board.
 - Every phase ends with three to five numbered options; the designer replies
   with a digit or free text.
 
 ## Preview and export
 
-- Preview: Canvas first; a localhost server rooted at the request folder is
-  the fallback.
+- Preview (`board.html` and `index.html`): Canvas first; a localhost server
+  rooted at the request folder is the fallback.
 - Export: always served from localhost, from the `.capture/` copy, one
   390×844 frame per `?state=<id>`, into the Figma file the designer links for
   that export. Never guess a destination.

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    Research board: Request title
+    Slug: request-slug
+    Research: research.md
+    Depth: Compact | Full
+    Date: YYYY-MM-DD
+    Cards: one per screenshot or pattern, numbered to match the research.md Sources table.
+    Screenshots: references/<nn>-<app>-<what>.png, relative to this file.
+  -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Request title — research board</title>
+  <style>
+    :root {
+      --color-canvas: #f4f5f7;
+      --color-surface: #ffffff;
+      --color-text: #111827;
+      --color-text-muted: #6b7280;
+      --color-primary: #2563eb;
+      --color-border: #e5e7eb;
+      --color-missing: #fef3c7;
+      --color-missing-text: #92400e;
+      --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.45);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 40px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --card-min: 240px;
+      --shot-ratio: 9 / 16;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: var(--space-xl) var(--space-lg);
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    a {
+      color: var(--color-primary);
+    }
+
+    :focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+      border-radius: var(--radius-sm);
+    }
+
+    .board-header {
+      margin-bottom: var(--space-xl);
+    }
+
+    .board-header h1 {
+      margin: 0 0 var(--space-sm);
+      font-size: 28px;
+    }
+
+    .board-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm) var(--space-md);
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: 14px;
+    }
+
+    .theme {
+      margin-bottom: var(--space-xl);
+    }
+
+    .theme h2 {
+      margin: 0 0 var(--space-xs);
+      font-size: 20px;
+    }
+
+    .theme-summary {
+      margin: 0 0 var(--space-md);
+      color: var(--color-text-muted);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(var(--card-min), 1fr));
+      gap: var(--space-md);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+    }
+
+    .shot {
+      position: relative;
+      margin: 0;
+      aspect-ratio: var(--shot-ratio);
+      background: var(--color-canvas);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .shot img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .shot-missing {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md);
+      background: var(--color-missing);
+      color: var(--color-missing-text);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .shot[data-missing] img {
+      display: none;
+    }
+
+    .shot[data-missing] .shot-missing {
+      display: flex;
+    }
+
+    .card-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+    }
+
+    .card-meta {
+      margin: 0;
+      color: var(--color-text-muted);
+      font-size: 13px;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .takeaway {
+      margin: 0;
+    }
+
+    .finding {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .source {
+      margin: auto 0 0;
+      font-size: 14px;
+    }
+
+    .recommendation {
+      padding: var(--space-lg);
+      background: var(--color-surface);
+      border: 2px solid var(--color-primary);
+      border-radius: var(--radius-md);
+    }
+
+    .recommendation h2 {
+      margin: 0 0 var(--space-md);
+      font-size: 20px;
+    }
+
+    .recommendation dl {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: var(--space-sm) var(--space-lg);
+      margin: 0;
+    }
+
+    .recommendation dt {
+      font-weight: 600;
+    }
+
+    .recommendation dd {
+      margin: 0;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .chips code {
+      display: inline-block;
+      padding: 2px var(--space-sm);
+      background: var(--color-canvas);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: var(--space-lg) var(--space-md);
+      }
+
+      .recommendation dl {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="board-header">
+      <h1>Request title — research board</h1>
+      <p class="board-meta">
+        <span>Slug: <code>request-slug</code></span>
+        <span>Depth: Compact</span>
+        <span>YYYY-MM-DD</span>
+        <span id="shot-count">Screenshots: — of —</span>
+        <a href="research.md">research.md</a>
+      </p>
+    </header>
+
+    <!-- One section per theme. Compact: 1–3 themes, 3–6 cards. Full: 3–6 themes. -->
+    <section class="theme" aria-labelledby="theme-1">
+      <h2 id="theme-1">Theme name</h2>
+      <p class="theme-summary">One line on what the cards in this theme show.</p>
+      <ul class="cards">
+        <li class="card">
+          <figure class="shot">
+            <img src="references/01-app-name-screen.png" alt="App name — screen shown in the screenshot" loading="lazy" />
+            <figcaption class="shot-missing">Screenshot not captured — see source</figcaption>
+          </figure>
+          <div class="card-body">
+            <p class="card-meta">Source #1 · App store listing</p>
+            <h3>App name</h3>
+            <p class="takeaway">What the screenshot shows, in one or two sentences.</p>
+            <p class="finding"><strong>Finding:</strong> Interaction — the pattern from research.md this supports.</p>
+            <p class="source"><a href="https://example.com" target="_blank" rel="noopener">Source</a> · accessed YYYY-MM-DD</p>
+          </div>
+        </li>
+        <!-- Screenshot not captured: keep the card, add data-missing, drop the img. -->
+        <li class="card">
+          <figure class="shot" data-missing>
+            <figcaption class="shot-missing">Screenshot not captured — see source</figcaption>
+          </figure>
+          <div class="card-body">
+            <p class="card-meta">Source #2 · Help page</p>
+            <h3>App name</h3>
+            <p class="takeaway">What the source describes.</p>
+            <p class="finding"><strong>Finding:</strong> Accessibility — the pattern from research.md this supports.</p>
+            <p class="source"><a href="https://example.com" target="_blank" rel="noopener">Source</a> · accessed YYYY-MM-DD</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="recommendation" aria-labelledby="recommendation">
+      <h2 id="recommendation">Recommended prototype</h2>
+      <dl>
+        <dt>Starter</dt>
+        <dd><code>bottom-sheet</code></dd>
+        <dt>States</dt>
+        <dd>
+          <ul class="chips">
+            <li><code>default</code></li>
+            <li><code>sheet-open</code></li>
+          </ul>
+        </dd>
+        <dt>Must-have interactions</dt>
+        <dd>Dismiss from the close button, backdrop, and Escape.</dd>
+      </dl>
+    </section>
+  </main>
+
+  <script>
+    const shots = [...document.querySelectorAll(".shot")];
+    const count = document.getElementById("shot-count");
+
+    const updateCount = () => {
+      const captured = shots.filter((shot) => !shot.hasAttribute("data-missing")).length;
+      count.textContent = `Screenshots: ${captured} of ${shots.length}`;
+    };
+
+    const markMissing = (img) => {
+      img.closest(".shot").setAttribute("data-missing", "");
+      updateCount();
+    };
+
+    for (const img of document.querySelectorAll(".shot img")) {
+      if (img.complete && img.naturalWidth === 0) markMissing(img);
+      img.addEventListener("error", () => markMissing(img));
+    }
+    updateCount();
+  </script>
+</body>
+</html>
