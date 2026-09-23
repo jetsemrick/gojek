@@ -1,6 +1,6 @@
-# Design Team Cursor Plugin
+# Design Cursor Plugin
 
-Private Cursor plugin for GoTo's mobile design-request workflow (v0.6.0):
+Private Cursor plugin for GoTo's mobile design-request workflow (v0.7.0):
 
 ```text
 Brief → Research + Prototype (one turn) → Iterate → Export to Figma
@@ -131,19 +131,24 @@ steps stop with install or OAuth instructions.
 ### Private team marketplace
 
 The repository root `.cursor-plugin/marketplace.json` points Cursor at
-`cursor-design-team-plugin/`.
+`design/`.
 
 1. **Dashboard → Plugins & MCPs → Team Marketplaces → Add Marketplace →
    Import from Repo**, and import `https://github.com/jetsemrick/goto`.
 2. Track the **`main`** branch.
-3. Install **Design Team** from **Customize → Plugins**.
+3. Install **Design** from **Customize → Plugins**.
+
+Upgrading from 0.6.x: the plugin was previously published as `design-team`
+(Design Team) in the `goto-private-plugins` marketplace. Uninstall
+`design-team` and install `design`; the identifier change is not picked up as
+an update. Existing `prototypes/<slug>/` folders are unaffected.
 
 Releases ship by merging to `main` with the version bumped in both
 `plugin.json` and `marketplace.json`. To roll back, revert on `main`.
 
 ### Local development
 
-1. Copy `cursor-design-team-plugin/` to `~/.cursor/plugins/local/design-team`
+1. Copy `design/` to `~/.cursor/plugins/local/design`
    (symlinks to outside targets are not loaded).
 2. Run **Developer: Reload Window** and confirm the skills, rules, and agent
    appear in Customize.
@@ -171,7 +176,7 @@ designer-linked file, and a permission denial.
 
 ```text
 .cursor-plugin/marketplace.json
-cursor-design-team-plugin/
+design/
 ├── .cursor-plugin/plugin.json
 ├── agents/design-research-verifier.md
 ├── rules/
