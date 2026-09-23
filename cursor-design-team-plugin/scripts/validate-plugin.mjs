@@ -28,6 +28,8 @@ const walk = (directory) => {
   });
 };
 
+const descriptions = new Map();
+
 const parseName = (path) => {
   const text = read(path);
   const frontmatter = text.match(/^---\n([\s\S]*?)\n---\n/);
@@ -37,8 +39,11 @@ const parseName = (path) => {
   }
   const name = frontmatter[1].match(/^name:\s*([a-z0-9.-]+)\s*$/m)?.[1];
   if (!name) fail(`${relative(repoRoot, path)} has no valid frontmatter name`);
-  if (!/^description:\s*\S+/m.test(frontmatter[1])) {
+  const description = frontmatter[1].match(/^description:\s*(\S.*)$/m)?.[1];
+  if (!description) {
     fail(`${relative(repoRoot, path)} has no frontmatter description`);
+  } else if (name) {
+    descriptions.set(name, description);
   }
   return name;
 };
@@ -52,7 +57,24 @@ const requiredFiles = [
   "cursor-design-team-plugin/skills/design-request/SKILL.md",
   "cursor-design-team-plugin/skills/design-export-figma/SKILL.md",
   "cursor-design-team-plugin/skills/inspect-design/SKILL.md",
+  "cursor-design-team-plugin/skills/design-prototype/templates/notes.md",
+  "cursor-design-team-plugin/skills/design-research/templates/research.md",
+  "cursor-design-team-plugin/skills/design-iterate/templates/feedback.md",
 ];
+
+const starterTemplates = [
+  "bottom-sheet",
+  "onboarding-step",
+  "list-detail",
+  "form",
+  "empty-error",
+  "settings",
+];
+for (const starter of starterTemplates) {
+  requiredFiles.push(
+    `cursor-design-team-plugin/skills/design-prototype/templates/${starter}.html`,
+  );
+}
 
 for (const file of requiredFiles) {
   if (!existsSync(join(repoRoot, file))) fail(`Missing required file: ${file}`);
@@ -255,6 +277,8 @@ const forbiddenFiles = [
   "cursor-design-team-plugin/skills/figma-inspect-handoff/SKILL.md",
   "cursor-design-team-plugin/skills/figma-design-to-code/SKILL.md",
   "cursor-design-team-plugin/skills/figma-code-connect/SKILL.md",
+  "cursor-design-team-plugin/prototypes/_template-v1.html",
+  "cursor-design-team-plugin/prototypes/_template-notes.md",
 ];
 for (const file of forbiddenFiles) {
   if (existsSync(join(repoRoot, file))) fail(`Forbidden stale file: ${file}`);
@@ -277,6 +301,10 @@ const forbiddenText = [
   ["design-iterate-feedback", "stale skill reference"],
   ["design-publish-figma", "stale skill reference"],
   ["figma-inspect-handoff", "stale skill reference"],
+  ["--figma-file-key", "command-style flag in a skills-only plugin"],
+  ["-v1.html", "flat prototype path (use prototypes/<slug>/index.html)"],
+  ["-notes.md", "flat notes path (use prototypes/<slug>/notes.md)"],
+  ["_template-", "stale root template reference"],
 ];
 for (const [needle, label] of forbiddenText) {
   if (allText.includes(needle)) fail(`${label} remains: ${needle}`);
@@ -305,7 +333,43 @@ const requiredContent = [
       "use_figma",
       "Figma Design URL",
       "fallback",
+      "Never guess a destination",
+      "prototypes/<slug>/.capture/",
+      "?state=<id>&capture=1",
+      "390×844",
+      "Prototype exports / <slug>",
+      "<slug> / <state> / v<version>",
+      "Figma export record",
     ],
+  ],
+  [
+    "skills/design-request/SKILL.md",
+    [
+      "prototypes/<slug>/",
+      "Fast path",
+      "Research first",
+      "Numbered options",
+      "continue <slug>",
+    ],
+  ],
+  [
+    "skills/design-research/SKILL.md",
+    ["prototypes/<slug>/research.md", "templates/research.md", "Sources"],
+  ],
+  [
+    "skills/design-prototype/SKILL.md",
+    [
+      "templates/",
+      "data-states",
+      "?capture=1",
+      "history/1.0.0.html",
+      "Canvas",
+      "npx --yes serve",
+    ],
+  ],
+  [
+    "skills/design-iterate/SKILL.md",
+    ["feedback.md", "F-###", "user test", "engineer", "history/<new version>.html"],
   ],
   [
     "README.md",
@@ -316,9 +380,83 @@ const requiredContent = [
       "plugin manifest does not support",
       ".cursor-plugin/marketplace.json",
       "skills-only",
+      "**`main`**",
+      "prototypes/<slug>/",
     ],
   ],
 ];
+
+for (const [name, description] of descriptions) {
+  if (description.length > 1024) {
+    fail(`${name} description exceeds 1024 characters`);
+  }
+  if (!/^["']/.test(description) && /: | #/.test(description)) {
+    fail(`${name} description contains ": " or " #"; quote it or rephrase for YAML`);
+  }
+  if (!description.includes("Not for")) {
+    fail(`${name} description needs a "Not for …" clause for routing`);
+  }
+}
+const routing = [
+  ["design-request", ["design a", "continue <slug>"]],
+  ["design-export-figma", ["export to Figma", "push to Figma", "instead of the official figma-generate-design"]],
+  ["design-iterate", ["feedback.md"]],
+];
+for (const [name, needles] of routing) {
+  for (const needle of needles) {
+    if (!descriptions.get(name)?.includes(needle)) {
+      fail(`${name} description must mention "${needle}"`);
+    }
+  }
+}
+
+for (const path of walk(join(pluginRoot, "rules"))) {
+  const globs = read(path).match(/^globs:\s*(.*)$/m)?.[1] ?? "";
+  if (/"\*\*\/\*\.[^"]*"/.test(globs)) {
+    fail(`${relative(repoRoot, path)} glob matches every repo file of that type: ${globs}`);
+  }
+}
+
+const templatesDir = join(pluginRoot, "skills", "design-prototype", "templates");
+for (const starter of starterTemplates) {
+  const path = join(templatesDir, `${starter}.html`);
+  if (!existsSync(path)) continue;
+  const html = read(path);
+  const label = `templates/${starter}.html`;
+  const states = html.match(/id="device"[^>]*data-states="([^"]+)"/)?.[1];
+  if (!states) {
+    fail(`${label} needs #device with data-states`);
+  } else if (!html.includes(`States: ${states}`)) {
+    fail(`${label} version comment must list States: ${states}`);
+  }
+  for (const needle of [
+    "--device-width: 390px",
+    "--device-height: 844px",
+    "html[data-capture]",
+    'params.get("state")',
+    'params.has("capture")',
+    'class="review-bar"',
+    "max(env(safe-area-inset-top",
+    "[hidden] {",
+    "Version: 1.0.0",
+  ]) {
+    if (!html.includes(needle)) fail(`${label} is missing ${needle}`);
+  }
+  if (/<script[^>]+src=|<link[^>]+href=|https?:\/\//.test(html)) {
+    fail(`${label} must be self-contained (no external scripts, links, or URLs)`);
+  }
+  if (/calc\(\s*\d+px\s*\+\s*env\(safe-area/.test(html)) {
+    fail(`${label} double-pads a safe area; use max() instead of a sum`);
+  }
+  if (/role="(?:alert)?dialog"/.test(html)) {
+    for (const needle of [".inert", '"Escape"', ".focus()"]) {
+      if (!html.includes(needle)) fail(`${label} dialog is missing ${needle}`);
+    }
+    if (/class="backdrop"[^>]*\shidden/.test(html)) {
+      fail(`${label} backdrop uses hidden, which blocks the fade transition`);
+    }
+  }
+}
 
 for (const [file, needles] of requiredContent) {
   const path = join(pluginRoot, file);
