@@ -1,152 +1,154 @@
 # Design Team Cursor Plugin
 
-Private Cursor plugin for GoTo's mobile design-request workflow:
+Private Cursor plugin for GoTo's mobile design-request workflow (v0.6.0):
 
 ```text
-Design request → Research → HTML prototype → Iterate → Export to Figma
+Brief → Research + Prototype (one turn) → Iterate → Export to Figma
 ```
 
-This plugin is **skills-only**. The agent loads the appropriate skill based on
-user intent. `design-request` is the sole orchestrator for the full flow; the
-included `design-research-verifier` agent is limited to isolated source and
-assumption checks.
+The plugin is **skills-only**. Designers ask in plain language and Cursor loads
+the matching skill; there are no slash commands. `design-request` owns the full
+flow. The `design-research-verifier` agent only runs isolated source checks.
 
-## Workflow
+## The four phases
 
-| Stage | Skill | Output |
+| Phase | Skill | Writes to `prototypes/<slug>/` |
 | --- | --- | --- |
-| Full flow | `design-request` | Checkpoints across all phases |
-| Research | `design-research` | Sourced pattern summary |
-| Prototype | `design-prototype` | Self-contained mobile HTML + notes |
-| Iterate | `design-iterate` | Updated HTML + changelog |
-| Export | `design-export-figma` | Live browser capture + Figma URL |
+| Research | `design-research` | `research.md` with a sources table |
+| Prototype | `design-prototype` | `index.html`, `notes.md`, `feedback.md`, `history/1.0.0.html` |
+| Iterate | `design-iterate` | Feedback rows, updated `index.html`, `history/<version>.html`, changelog |
+| Export to Figma | `design-export-figma` | Per-state Figma links in the `notes.md` export record |
 
-Secondary skills:
+Secondary skills: `inspect-design` (Figma Design frame → handoff notes) and
+`figjam-summary` (FigJam board → decisions and action items).
 
-- `inspect-design` — mobile handoff notes from a Figma Design URL.
-- `figjam-summary` — decisions, themes, and action items from a FigJam board.
+### Fast path by default
 
-## How to invoke
+A new brief gets research **and** a clickable prototype in one turn, with one
+checkpoint at the end. Say "research first" to add a checkpoint after
+`research.md`. Every phase ends with numbered options, so a designer can reply
+`1`, `2`, or describe what they want.
 
-Ask in natural language; Cursor loads the matching skill automatically. Examples:
+### One folder per request
 
 ```text
-Run a design request: mobile savings nudge at checkout — bottom sheet, dismissible, 390px
-Research sticky CTA patterns above the home indicator on iOS
-Prototype the login screen from the research summary — email, SSO, error state
-Iterate on prototypes/savings-nudge-v1.html — increase CTA target to 48px
-Export prototypes/savings-nudge-v1.html to Figma
-Inspect this Figma frame for mobile handoff: [URL]
-Summarize this FigJam board: [URL]
+prototypes/<slug>/
+├── research.md          # sources, patterns, recommended starter and states
+├── index.html           # current prototype
+├── notes.md             # version, states table, changelog, Figma export record
+├── feedback.md          # ID · date · source · feedback · priority · status · version
+└── history/<version>.html
 ```
 
-For the full workflow, start with a brief that mentions all phases or ask the
-agent to load `design-request`.
+Resume any time with "continue <slug>".
 
-## Install from the private marketplace
+## What designers type
 
-This repository is a multi-plugin marketplace. The root
-`.cursor-plugin/marketplace.json` points Cursor to
-`cursor-design-team-plugin/`.
+```text
+Design a savings nudge bottom sheet for checkout — dismissible, trust copy
+I need an onboarding step for biometrics. Research first.
+Make the CTA sticky and add a forgot-password link
+Engineering said the close button needs a label — P1
+Approved — export to Figma: https://www.figma.com/design/<fileKey>/Checkout
+Continue checkout-savings-nudge
+Inspect this frame for handoff: <Figma Design URL with node-id>
+Summarize this FigJam board: <FigJam URL>
+```
 
-1. In **Dashboard → Plugins & MCPs → Team Marketplaces**, choose
-   **Add Marketplace → Import from Repo**.
-2. Import `https://github.com/jetsemrick/goto` and select the branch tracked by
-   the team marketplace.
-3. Install **Design Team** from **Customize → Plugins**.
-4. Install the separate official Figma plugin:
+"Export/push/send to Figma" routes to `design-export-figma`, not the official
+`figma-generate-design` skill, whenever the source is a prototype in
+`prototypes/`.
 
-   ```text
-   /add-plugin figma
-   ```
+## Prototype starters
 
-5. Open **Customize → Plugins → Figma**, choose
-   **Connect/Authenticate**, and complete Figma OAuth.
-6. Reload Cursor so the official skills and remote tools are available.
+`design-prototype` ships six unbranded mobile starters in
+`skills/design-prototype/templates/`:
+
+| Starter | States |
+| --- | --- |
+| `bottom-sheet` | `default`, `sheet-open` |
+| `onboarding-step` | `step-1`, `step-2`, `step-3` |
+| `list-detail` | `list`, `detail` |
+| `form` | `default`, `error`, `submitting`, `success` |
+| `empty-error` | `content`, `empty`, `error`, `loading` |
+| `settings` | `default`, `notifications-off`, `sign-out-confirm` |
+
+Each starter is one self-contained HTML file with:
+
+- a fixed 390×844 device frame that fills the screen on phones;
+- `?state=<id>` for any state listed in `data-states`;
+- `?capture=1` for a clean frame with no review chrome or motion;
+- a "State" review bar under the frame for flipping states in preview;
+- safe areas via `max()` (no double padding), 48px targets, and `inert` plus
+  Escape and focus return for sheets and dialogs.
+
+## Preview: Canvas first
+
+The agent shows `prototypes/<slug>/index.html` in Cursor's Canvas preview. If
+Canvas cannot render it, the fallback is a local server rooted at the request
+folder (`npx --yes serve -l <port> prototypes/<slug>` or
+`python3 -m http.server`) opened in Cursor's browser. Export always uses a
+local server.
+
+## Export to Figma
+
+1. The designer pastes a **Figma Design file link** for this export. If it is
+   missing, the skill asks and stops. It never guesses a destination and never
+   falls back to drafts, a new file, or the clipboard on its own.
+2. Official Figma plugin and OAuth preflight.
+3. `index.html` is copied to `prototypes/<slug>/.capture/`. The capture script
+   is injected only into that copy, which is deleted afterwards.
+4. The copy is served on localhost and each state is captured with
+   `generate_figma_design` from `index.html?state=<id>&capture=1` as a 390×844
+   frame.
+5. Frames are placed on page `Prototype exports / <slug>` and named
+   `<slug> / <state> / v<version>`. `use_figma` is used only for this naming
+   and placement, never to rebuild the DOM.
+6. One row per successful state, with its Figma node link, is appended to
+   `notes.md`.
+
+Editing a file outside the designer's drafts requires a **Full seat** and
+**edit permission**. A permission error stops the export and asks for another
+link.
+
+## Install
+
+### Official Figma plugin first
+
+```text
+/add-plugin figma
+```
+
+Then open **Customize → Plugins → Figma**, choose **Connect/Authenticate**,
+finish Figma OAuth, and reload Cursor.
 
 The current Cursor plugin manifest does not support declaring another plugin as
-a dependency. Install order is therefore explicit: **Figma first (with OAuth),
-then use this plugin's Figma-dependent skills**. This plugin intentionally
-does not ship a Figma `mcp.json`, accept a personal-token variable, or copy
-Figma's official skills.
+a dependency, so install order is explicit. This plugin ships no Figma
+`mcp.json`, no personal-token variable, and no copies of Figma's official
+skills. Research, prototyping, and iteration work without Figma; only Figma
+steps stop with install or OAuth instructions.
 
-Evidence:
+### Private team marketplace
 
-- Cursor's current [plugin manifest reference](https://cursor.com/docs/reference/plugins)
-  lists supported manifest fields and no plugin-dependency field.
-- Figma's [remote server setup](https://developers.figma.com/docs/figma-mcp-server/remote-server-installation/)
-  recommends `/add-plugin figma` for Cursor and requires OAuth.
-- Figma's [code-to-canvas guide](https://developers.figma.com/docs/figma-mcp-server/code-to-canvas/)
-  documents remote-only live browser capture, seat behavior, and
-  `generate_figma_design`.
+The repository root `.cursor-plugin/marketplace.json` points Cursor at
+`cursor-design-team-plugin/`.
 
-## Figma preflight
+1. **Dashboard → Plugins & MCPs → Team Marketplaces → Add Marketplace →
+   Import from Repo**, and import `https://github.com/jetsemrick/goto`.
+2. Track the **`main`** branch. Before this plugin merges, pilots can
+   temporarily track `cursor/design-team-plugin-scaffold`; switch to `main`
+   after merge.
+3. Install **Design Team** from **Customize → Plugins**.
 
-Every skill that needs Figma must verify:
+Releases ship by merging to `main` with the version bumped in both
+`plugin.json` and `marketplace.json`. To roll back, revert on `main`.
 
-1. Official `figma-use` and `figma-generate-design` skills are present.
-2. The required remote Figma tools are present; export specifically requires
-   `generate_figma_design`.
-3. The Figma plugin is connected through OAuth.
+### Local development
 
-If a check fails, the Figma-dependent work stops with the install/auth
-instructions above. HTML-only research, prototyping, and iteration remain
-available. Personal access tokens, Bearer headers, and the desktop MCP are not
-valid substitutes for remote code-to-canvas capture.
-
-## HTML prototypes
-
-Prototypes remain self-contained `.html` files with inline CSS/JS:
-
-- 390px mobile baseline with safe-area handling
-- semantic sections and accessible touch targets
-- version comment plus `*-notes.md` changelog
-- no build step for the existing Cursor Canvas/artifact preview assumption
-
-Default paths are `prototypes/<slug>-v1.html` and
-`prototypes/<slug>-notes.md`. If Canvas preview is unavailable, open the file
-through a local browser server; the export workflow uses that same fallback.
-
-## Export HTML to Figma
-
-Load `design-export-figma` when the user asks to export or capture an approved
-HTML prototype into Figma. Export uses Figma's remote-only
-`generate_figma_design` code-to-canvas tool:
-
-1. Validate the approved HTML and companion notes.
-2. Serve the artifact at a verified `http://localhost:<port>/...` URL.
-3. Open the live page through the official capture workflow.
-4. Capture the full screen, selected element, or requested state.
-5. Return the exact Figma Design URL and record it in notes only after success.
-
-### Create and update modes
-
-| Mode | Input | Permission behavior |
-| --- | --- | --- |
-| Create | No file key | Creates a new file in selected team/organization drafts; any seat can use code to canvas in drafts. |
-| Update | Existing Figma Design key/URL | Adds the capture to that file; outside drafts this requires a **Full seat** and **edit permission**. |
-
-Permission errors are reported rather than silently changing targets. With user
-approval, a new draft file or clipboard capture can be used instead.
-
-`use_figma` is reserved for optional post-capture refinement, such as replacing
-captured layers with design-system components. It is not used to manually
-rebuild the HTML.
-
-If capture fails, the workflow preserves the HTML and does not claim success or
-write a Figma export record. The retained fallback is browser/Canvas review plus
-manual screenshot and structure/spec import.
-
-## Local development
-
-1. Put `cursor-design-team-plugin/` under
-   `~/.cursor/plugins/local/design-team` (copy it; external symlink targets are
-   not loaded).
-2. Run **Developer: Reload Window**.
-3. Confirm skills, rules, and the `design-research-verifier` agent appear in
-   Customize.
-4. Install/authenticate the official Figma plugin separately if testing Figma
-   paths.
+1. Copy `cursor-design-team-plugin/` to `~/.cursor/plugins/local/design-team`
+   (symlinks to outside targets are not loaded).
+2. Run **Developer: Reload Window** and confirm the skills, rules, and agent
+   appear in Customize.
 
 ## Validation
 
@@ -156,22 +158,16 @@ From the repository root:
 npm run validate:plugin
 ```
 
-The validator checks:
+The validator checks the manifests and versions, skills-only packaging, unique
+names, trigger descriptions (length, "Not for" clauses, export routing),
+narrow rule globs, starter templates (frame, `?state=`, capture mode, sheet
+accessibility), request-folder guidance, and forbidden auth or stale
+references.
 
-- plugin and marketplace manifest shape/version/path
-- required skills, agent, rules, logo, and marketplace entry
-- skills-only packaging (no command components)
-- unique agent/skill names
-- stale or forbidden references, PAT/Bearer config, and duplicate Figma MCP
-- required Figma preflight and browser-capture documentation
-
-Manual smoke tests still required before rollout:
-
-- install from the private marketplace
-- missing-plugin and unauthenticated OAuth stop paths
-- one create capture and one permitted existing-file capture
-- permission denial with no silent target change
-- Canvas preview in the team's Cursor build and localhost fallback
+Manual checks still needed before rollout: marketplace install from `main`,
+Canvas preview in the team's Cursor build, trigger routing against the official
+Figma plugin, missing-plugin and OAuth stop paths, one multi-state export into a
+designer-linked file, and a permission denial.
 
 ## Structure
 
@@ -180,13 +176,12 @@ Manual smoke tests still required before rollout:
 cursor-design-team-plugin/
 ├── .cursor-plugin/plugin.json
 ├── agents/design-research-verifier.md
-├── prototypes/          # HTML artifacts + notes (see _template-* starters)
 ├── rules/
 ├── skills/
 │   ├── design-request/
-│   ├── design-research/
-│   ├── design-prototype/
-│   ├── design-iterate/
+│   ├── design-research/        # templates/research.md
+│   ├── design-prototype/       # templates/*.html, templates/notes.md
+│   ├── design-iterate/         # templates/feedback.md
 │   ├── design-export-figma/
 │   ├── inspect-design/
 │   └── figjam-summary/
@@ -196,8 +191,5 @@ cursor-design-team-plugin/
 
 ## Scope
 
-MVP excludes design-token sync, deep application code generation, and bundled
-copies of official Figma skills. Figma/FigJam are optional research inputs;
-approved HTML remains the working deliverable until export.
-
-Internal team use.
+Out of scope: design-token sync, production app code, and bundled copies of
+official Figma skills. Internal team use.
