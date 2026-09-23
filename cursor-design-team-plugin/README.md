@@ -135,9 +135,7 @@ The repository root `.cursor-plugin/marketplace.json` points Cursor at
 
 1. **Dashboard → Plugins & MCPs → Team Marketplaces → Add Marketplace →
    Import from Repo**, and import `https://github.com/jetsemrick/goto`.
-2. Track the **`main`** branch. Before this plugin merges, pilots can
-   temporarily track `cursor/design-team-plugin-scaffold`; switch to `main`
-   after merge.
+2. Track the **`main`** branch.
 3. Install **Design Team** from **Customize → Plugins**.
 
 Releases ship by merging to `main` with the version bumped in both
