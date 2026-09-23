@@ -1,0 +1,57 @@
+---
+description: Conventions for design-request HTML prototypes in prototypes/<slug>/ — fixed 390×844 frame, ?state= states, capture mode, safe areas, touch targets, versioning.
+alwaysApply: false
+globs: ["**/prototypes/**/*.html"]
+---
+
+# HTML prototype standards
+
+Apply when creating or editing `prototypes/<slug>/index.html`. Starters live
+in the `design-prototype` skill's `templates/` folder.
+
+## File
+
+- One self-contained file: inline `<style>` and `<script>`, no external
+  scripts, fonts, or network calls; inline SVG for icons.
+- Version comment in `<head>`: prototype, slug, version, starter, states,
+  changelog line.
+- `index.html` is always the latest version; every version is also saved as
+  `history/<version>.html`.
+
+## Frame and states
+
+- `#device` is a fixed 390×844 frame on desktop and fills the viewport on
+  phones (`max-width: 430px`).
+- `data-states` on `#device` lists every state id. `render(state)` derives the
+  whole screen from the id, so `?state=<id>` is deterministic.
+- `?capture=1` renders only the 390×844 frame: no review bar, no shadow, no
+  motion. Export depends on it.
+- The review bar ("State" switcher) sits outside `#device`.
+
+## Safe areas
+
+- Top: `max(env(safe-area-inset-top, 0px), 47px)`; bottom CTAs:
+  `max(env(safe-area-inset-bottom, 0px), 34px)` plus spacing. Use `max()`, not a
+  sum, so real devices are not double-padded.
+
+## Touch and accessibility
+
+- Touch targets 48px (meets 44pt iOS and 48dp Android).
+- Semantic elements; visible `:focus-visible`; body text contrast at least WCAG AA.
+- Sheets and dialogs: opacity-faded backdrop (no `hidden`), `inert` when
+  closed, background `inert` when open, Escape closes, focus moves in and
+  returns to the opener.
+- Use the `hidden` attribute for whole views; the base CSS forces
+  `[hidden] { display: none !important; }`.
+
+## Style
+
+- System font stack unless the brief names brand fonts.
+- Tokens in `:root`; change values, keep names stable across iterations.
+- Label placeholder copy in `notes.md` open questions.
+
+## Do not
+
+- Desktop-first layouts or breakpoints above 390px as the primary target.
+- CDN frameworks (React, Tailwind) unless the designer asks.
+- Remove the state scaffold or capture CSS.

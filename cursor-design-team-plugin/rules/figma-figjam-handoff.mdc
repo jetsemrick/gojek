@@ -1,0 +1,55 @@
+---
+description: Figma and FigJam URL handling, node-id extraction, and file-type routing for design handoff.
+alwaysApply: false
+---
+
+# Figma & FigJam handoff
+
+## URL recognition
+
+Designers paste links from the browser. Accept these forms:
+
+- **Figma Design:** `https://www.figma.com/design/{fileKey}/{slug}?node-id={nodeId}`
+- **Figma (legacy):** `https://www.figma.com/file/{fileKey}/...?node-id={nodeId}`
+- **FigJam:** `https://www.figma.com/board/{fileKey}/...` or `.../figjam/...`
+- **Dev Mode / prototype links** — still valid; extract `fileKey` and `node-id`.
+
+### Node ID normalization
+
+Figma URLs encode node IDs with hyphens (e.g. `123-456`). MCP tools often expect colons (`123:456`). When calling Figma MCP:
+
+1. Parse `node-id` from the query string (decode `%3A` if present).
+2. Convert `-` to `:` for tool parameters when required.
+
+For inspect calls, pass the **file key + node id** to the official Figma tools.
+For HTML export, use the separate localhost browser-capture workflow in
+`design-export-figma`, which accepts only a Figma Design file link the
+designer supplies for that export.
+
+## Route by file type
+
+| URL pattern | Workflow |
+| --- | --- |
+| `/design/` or `/file/` + frame/layer | Inspect design → handoff specs, mobile notes |
+| `/board/` or FigJam | FigJam summary → decisions, stickies, flows |
+| No `node-id` | Ask designer to select a frame/layer and copy link again |
+
+## Prompting style for designers
+
+- Use plain language: "spacing," "font size," "button states" — not "auto-layout flex gap."
+- Prefer **structured markdown** summaries over raw JSON dumps.
+- Include **screenshot references** when MCP returns image assets; do not invent visual details.
+- If the official Figma plugin is missing, stop Figma-dependent work and tell
+  the designer to run `/add-plugin figma`, reload Cursor, and retry.
+- If authentication is required, stop and tell the designer to use
+  **Customize → Plugins → Figma → Connect/Authenticate** and complete OAuth.
+- Never request a PAT or configure a Bearer header.
+
+## FigJam conventions
+
+When summarizing boards:
+
+- Group stickies by **section** or **color** when sections are labeled.
+- Surface **decisions**, **open questions**, and **action items** separately.
+- Describe **connectors/flows** as user journeys, not graph notation.
+- Note workshop metadata (date, participants) only if visible on the board.

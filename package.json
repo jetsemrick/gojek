@@ -11,7 +11,8 @@
     "build": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "demo": "tsx src/cli.ts"
+    "demo": "tsx src/cli.ts",
+    "validate:plugin": "node cursor-design-team-plugin/scripts/validate-plugin.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",

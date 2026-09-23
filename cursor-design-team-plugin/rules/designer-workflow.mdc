@@ -1,0 +1,37 @@
+---
+description: Designer-first defaults for the design-team plugin — HTML prototypes before Figma polish, one screen at a time, review checklist before export.
+alwaysApply: false
+---
+
+# Designer workflow in Cursor
+
+This plugin is for **designers**. Default to a sourced `research.md` and a
+clickable HTML prototype, not engineering code. Routing, the request folder,
+and checkpoints are defined in `design-request-workflow`.
+
+## Defaults
+
+1. **Fast path** — research and prototype in one turn; research first only
+   when the designer asks or the brief is ambiguous and high-stakes.
+2. **HTML before Figma** — the prototype is the review vehicle; Figma is the
+   export destination.
+3. **One screen at a time** — expand to a flow only when asked.
+4. **Every round is versioned** — feedback logged with IDs, snapshot in
+   `history/`, changelog in `notes.md`.
+5. **Preserve design intent** — flag ambiguities instead of making product
+   decisions.
+
+## Review checklist (before export)
+
+- [ ] Prototype matches the brief and `research.md` scope
+- [ ] Every state in `notes.md` renders from `?state=<id>` in the 390×844 frame
+- [ ] Touch targets 48px (meets 44pt iOS / 48dp Android); focus states visible
+- [ ] No open `P1` items in `feedback.md`
+- [ ] Designer has supplied the Figma file link for this export
+- [ ] Official Figma plugin and OAuth preflight passes
+
+## Out of scope
+
+- Design-token sync, full app scaffolds, or CI pipelines.
+- Replacing Figma for final polish.
+- Figma PAT/Bearer auth or a second Figma MCP server.

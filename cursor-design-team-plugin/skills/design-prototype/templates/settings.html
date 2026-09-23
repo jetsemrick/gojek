@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    Prototype: Settings
+    Slug: request-slug
+    Version: 1.0.0
+    Template: settings
+    Request: prototypes/request-slug/research.md
+    States: default notifications-off sign-out-confirm
+    Changelog: Initial prototype
+  -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Settings — prototype</title>
+  <style>
+    /* Tokens: edit here and keep names stable across iterations. */
+    :root {
+      --color-canvas: #e9ebef;
+      --color-surface: #ffffff;
+      --color-surface-muted: #f4f5f7;
+      --color-text: #111827;
+      --color-text-muted: #6b7280;
+      --color-primary: #2563eb;
+      --color-primary-pressed: #1d4ed8;
+      --color-danger: #dc2626;
+      --color-success: #15803d;
+      --color-border: #e5e7eb;
+      --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.45);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --tap-min: 48px;
+      --device-width: 390px;
+      --device-height: 844px;
+      --status-bar: 47px;
+      --home-indicator: 34px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+    }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      padding: var(--space-lg) 0;
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    button,
+    input {
+      font: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    /* Fixed 390×844 device frame; fills the viewport on real phones. */
+    .device {
+      position: relative;
+      flex: none;
+      width: var(--device-width);
+      height: var(--device-height);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--color-surface);
+      border-radius: 44px;
+      box-shadow: 0 20px 50px rgba(17, 24, 39, 0.18);
+    }
+
+    .screen {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      /* max() rather than a sum: real devices report their own inset. */
+      padding-top: max(env(safe-area-inset-top, 0px), var(--status-bar));
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+    }
+
+    .screen__header {
+      padding: var(--space-sm) var(--space-md) var(--space-md);
+    }
+
+    .screen__header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      line-height: 1.2;
+    }
+
+    .screen__body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 0 var(--space-md) var(--space-lg);
+    }
+
+    .screen__footer {
+      display: grid;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      padding-bottom: calc(max(env(safe-area-inset-bottom, 0px), var(--home-indicator)) + var(--space-sm));
+      border-top: 1px solid var(--color-border);
+    }
+
+    .muted {
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .btn {
+      appearance: none;
+      width: 100%;
+      min-height: var(--tap-min);
+      padding: 0 var(--space-md);
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--color-primary);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn:active {
+      background: var(--color-primary-pressed);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .btn--secondary {
+      border: 1px solid var(--color-border);
+      background: transparent;
+      color: var(--color-text);
+    }
+
+    .btn--secondary:active {
+      background: var(--color-surface-muted);
+    }
+
+    .btn--text {
+      background: transparent;
+      color: var(--color-primary);
+    }
+
+    .btn--text:active {
+      background: var(--color-surface-muted);
+    }
+
+    /* Review state switcher: preview only; hidden on phones and during capture. */
+    .review-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--space-xs);
+      max-width: var(--device-width);
+      font-size: 0.8125rem;
+    }
+
+    .review-bar::before {
+      content: "State";
+      align-self: center;
+      margin-right: var(--space-xs);
+      color: var(--color-text-muted);
+    }
+
+    .review-bar button {
+      min-height: 32px;
+      padding: 0 var(--space-sm);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      background: var(--color-surface);
+      cursor: pointer;
+    }
+
+    .review-bar button[aria-pressed="true"] {
+      border-color: var(--color-text);
+      background: var(--color-text);
+      color: var(--color-surface);
+    }
+
+    @media (max-width: 430px) {
+      body {
+        justify-content: flex-start;
+        padding: 0;
+      }
+
+      .device {
+        width: 100%;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .review-bar {
+        display: none;
+      }
+    }
+
+    /* ?capture=1: exactly one 390×844 frame for Figma, no chrome or motion. */
+    html[data-capture] body {
+      display: block;
+      width: var(--device-width);
+      height: var(--device-height);
+      min-height: 0;
+      padding: 0;
+      overflow: hidden;
+      background: var(--color-surface);
+    }
+
+    html[data-capture] .device {
+      width: var(--device-width);
+      height: var(--device-height);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    html[data-capture] .review-bar {
+      display: none;
+    }
+
+    html[data-capture] *,
+    html[data-capture] *::before,
+    html[data-capture] *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+
+    .backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .group {
+      margin: 0 0 var(--space-lg);
+      padding: 0;
+      list-style: none;
+      border-radius: var(--radius-md);
+      background: var(--color-surface-muted);
+    }
+
+    .group__label {
+      margin: 0 0 var(--space-xs) var(--space-md);
+      color: var(--color-text-muted);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .setting {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      width: 100%;
+      min-height: 52px;
+      padding: 0 var(--space-md);
+      border: none;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .group li + li .setting {
+      border-top: 1px solid var(--color-border);
+    }
+
+    .setting__value {
+      color: var(--color-text-muted);
+    }
+
+    .switch {
+      position: relative;
+      flex: none;
+      width: 51px;
+      height: 31px;
+      border-radius: 999px;
+      background: var(--color-border);
+      transition: background 0.2s ease;
+    }
+
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 27px;
+      height: 27px;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(17, 24, 39, 0.25);
+      transition: transform 0.2s ease;
+    }
+
+    [aria-checked="true"] .switch {
+      background: var(--color-success);
+    }
+
+    [aria-checked="true"] .switch::after {
+      transform: translateX(20px);
+    }
+
+    .setting--danger {
+      justify-content: center;
+      color: var(--color-danger);
+      font-weight: 600;
+    }
+
+    .dialog {
+      position: absolute;
+      top: 50%;
+      left: var(--space-lg);
+      right: var(--space-lg);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-50%) scale(0.96);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .dialog.is-open {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+
+    .dialog h2 {
+      margin: 0 0 var(--space-sm);
+      font-size: 1.125rem;
+    }
+
+    .dialog p {
+      margin: 0 0 var(--space-lg);
+    }
+
+    .dialog__actions {
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .btn--danger {
+      background: var(--color-danger);
+    }
+
+    .btn--danger:active {
+      background: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="device" id="device" data-screen="settings" data-states="default notifications-off sign-out-confirm">
+    <main class="screen">
+      <header class="screen__header">
+        <h1>Settings</h1>
+      </header>
+
+      <section class="screen__body">
+        <p class="group__label" id="label-account">Account</p>
+        <ul class="group" aria-labelledby="label-account">
+          <li><button type="button" class="setting">Profile <span class="setting__value">Name ›</span></button></li>
+          <li><button type="button" class="setting">Payment methods <span class="setting__value">›</span></button></li>
+        </ul>
+
+        <p class="group__label" id="label-preferences">Preferences</p>
+        <ul class="group" aria-labelledby="label-preferences">
+          <li>
+            <button type="button" class="setting" role="switch" id="notifications" aria-checked="true">
+              Notifications <span class="switch" aria-hidden="true"></span>
+            </button>
+          </li>
+          <li><button type="button" class="setting">Language <span class="setting__value">English ›</span></button></li>
+        </ul>
+
+        <ul class="group">
+          <li><button type="button" class="setting setting--danger" id="sign-out" aria-haspopup="dialog">Sign out</button></li>
+        </ul>
+      </section>
+    </main>
+
+    <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+    <div class="dialog" id="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-body">
+      <h2 id="dialog-title">Sign out?</h2>
+      <p class="muted" id="dialog-body">Short consequence of signing out.</p>
+      <div class="dialog__actions">
+        <button type="button" class="btn btn--danger" data-close>Sign out</button>
+        <button type="button" class="btn btn--secondary" data-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="review-bar" aria-label="Review states"></nav>
+
+  <script>
+    // State scaffold (same in every template): ?state=<id> picks one of the
+    // ids in #device[data-states]; ?capture=1 strips review chrome for Figma.
+    const device = document.getElementById("device");
+    const STATES = device.dataset.states.trim().split(/\s+/);
+    const params = new URLSearchParams(location.search);
+    if (params.has("capture")) document.documentElement.setAttribute("data-capture", "");
+
+    const reviewButtons = STATES.map((id) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = id;
+      button.addEventListener("click", () => setState(id));
+      document.querySelector(".review-bar").append(button);
+      return button;
+    });
+
+    function setState(id, { interactive = false } = {}) {
+      const state = STATES.includes(id) ? id : STATES[0];
+      const previous = device.dataset.state;
+      device.dataset.state = state;
+      render(state, { previous, interactive });
+      for (const button of reviewButtons) {
+        button.setAttribute("aria-pressed", String(button.textContent === state));
+      }
+      try {
+        const url = new URL(location.href);
+        url.searchParams.set("state", state);
+        history.replaceState(null, "", url);
+      } catch {
+        // Sandboxed previews (for example Canvas) may block URL updates.
+      }
+    }
+
+    const screen = document.querySelector(".screen");
+    const dialog = document.getElementById("dialog");
+    const backdrop = document.getElementById("backdrop");
+    const signOut = document.getElementById("sign-out");
+    const notifications = document.getElementById("notifications");
+    let notificationsOn = true;
+
+    function render(state, { previous, interactive }) {
+      const open = state === "sign-out-confirm";
+      if (state === "default") notificationsOn = true;
+      if (state === "notifications-off") notificationsOn = false;
+      notifications.setAttribute("aria-checked", String(notificationsOn));
+      dialog.classList.toggle("is-open", open);
+      backdrop.classList.toggle("is-open", open);
+      dialog.inert = !open;
+      screen.inert = open;
+      if (interactive && open) dialog.querySelector(".btn--secondary").focus();
+      if (interactive && previous === "sign-out-confirm" && !open) signOut.focus();
+    }
+
+    const baseState = () => (notificationsOn ? "default" : "notifications-off");
+
+    notifications.addEventListener("click", () => {
+      setState(notificationsOn ? "notifications-off" : "default", { interactive: true });
+    });
+    signOut.addEventListener("click", () => setState("sign-out-confirm", { interactive: true }));
+    for (const element of [backdrop, ...dialog.querySelectorAll("[data-close]")]) {
+      element.addEventListener("click", () => setState(baseState(), { interactive: true }));
+    }
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && device.dataset.state === "sign-out-confirm") {
+        setState(baseState(), { interactive: true });
+      }
+    });
+
+    setState(params.get("state") ?? STATES[0]);
+  </script>
+</body>
+</html>

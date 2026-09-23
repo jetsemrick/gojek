@@ -1,0 +1,59 @@
+---
+description: Design request workflow — one prototypes/<slug>/ folder per request, fast path (research + prototype in one turn), numbered checkpoint options, Canvas-first preview, and Figma export to a designer-supplied link.
+alwaysApply: false
+---
+
+# Design request workflow
+
+```text
+Brief → Research + Prototype (one turn) → Iterate → Export to Figma
+```
+
+## Routing
+
+| Designer signal | Skill |
+| --- | --- |
+| New brief: "design a…", "I need a screen for…", "continue <slug>" | `design-request` |
+| "Research…", "how do other apps…", "research first" | `design-research` |
+| "Prototype this", "build it", "make it clickable" | `design-prototype` |
+| Changes or comments on an existing prototype | `design-iterate` |
+| "Export/push/send to Figma", Figma file link after approval | `design-export-figma` (not the official `figma-generate-design`) |
+| Figma Design frame link + "inspect/spec/review" | `inspect-design` |
+| FigJam board link + "summarize" | `figjam-summary` |
+
+## Request folder
+
+```text
+prototypes/<slug>/
+├── research.md       # sources and recommended starter/states
+├── index.html        # current prototype
+├── notes.md          # version, states table, changelog, Figma export record
+├── feedback.md       # ID · date · source · feedback · priority · status · version
+└── history/<version>.html
+```
+
+A temporary `prototypes/<slug>/.capture/` exists only during export and is
+deleted afterwards.
+
+## Checkpoints
+
+- **Fast path (default):** one checkpoint after the prototype.
+- **Research first (opt-in):** an extra checkpoint after `research.md`.
+- Every phase ends with three to five numbered options; the designer replies
+  with a digit or free text.
+
+## Preview and export
+
+- Preview: Canvas first; a localhost server rooted at the request folder is
+  the fallback.
+- Export: always served from localhost, from the `.capture/` copy, one
+  390×844 frame per `?state=<id>`, into the Figma file the designer links for
+  that export. Never guess a destination.
+
+## Figma preflight
+
+Before any Figma tool call, confirm the official Figma plugin skills and
+remote tools are present. If missing, stop that step and tell the designer to
+run `/add-plugin figma`, reload Cursor, and retry. On an auth error, stop and
+point to **Customize → Plugins → Figma → Connect/Authenticate** (OAuth). Never
+request a PAT or add a Bearer header.

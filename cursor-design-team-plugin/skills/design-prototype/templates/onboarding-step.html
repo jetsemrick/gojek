@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    Prototype: Onboarding step
+    Slug: request-slug
+    Version: 1.0.0
+    Template: onboarding-step
+    Request: prototypes/request-slug/research.md
+    States: step-1 step-2 step-3
+    Changelog: Initial prototype
+  -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Onboarding step — prototype</title>
+  <style>
+    /* Tokens: edit here and keep names stable across iterations. */
+    :root {
+      --color-canvas: #e9ebef;
+      --color-surface: #ffffff;
+      --color-surface-muted: #f4f5f7;
+      --color-text: #111827;
+      --color-text-muted: #6b7280;
+      --color-primary: #2563eb;
+      --color-primary-pressed: #1d4ed8;
+      --color-danger: #dc2626;
+      --color-success: #15803d;
+      --color-border: #e5e7eb;
+      --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.45);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --tap-min: 48px;
+      --device-width: 390px;
+      --device-height: 844px;
+      --status-bar: 47px;
+      --home-indicator: 34px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+    }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      padding: var(--space-lg) 0;
+      background: var(--color-canvas);
+      color: var(--color-text);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    button,
+    input {
+      font: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    /* Fixed 390×844 device frame; fills the viewport on real phones. */
+    .device {
+      position: relative;
+      flex: none;
+      width: var(--device-width);
+      height: var(--device-height);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--color-surface);
+      border-radius: 44px;
+      box-shadow: 0 20px 50px rgba(17, 24, 39, 0.18);
+    }
+
+    .screen {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      /* max() rather than a sum: real devices report their own inset. */
+      padding-top: max(env(safe-area-inset-top, 0px), var(--status-bar));
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+    }
+
+    .screen__header {
+      padding: var(--space-sm) var(--space-md) var(--space-md);
+    }
+
+    .screen__header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      line-height: 1.2;
+    }
+
+    .screen__body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 0 var(--space-md) var(--space-lg);
+    }
+
+    .screen__footer {
+      display: grid;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      padding-bottom: calc(max(env(safe-area-inset-bottom, 0px), var(--home-indicator)) + var(--space-sm));
+      border-top: 1px solid var(--color-border);
+    }
+
+    .muted {
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .btn {
+      appearance: none;
+      width: 100%;
+      min-height: var(--tap-min);
+      padding: 0 var(--space-md);
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--color-primary);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn:active {
+      background: var(--color-primary-pressed);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .btn--secondary {
+      border: 1px solid var(--color-border);
+      background: transparent;
+      color: var(--color-text);
+    }
+
+    .btn--secondary:active {
+      background: var(--color-surface-muted);
+    }
+
+    .btn--text {
+      background: transparent;
+      color: var(--color-primary);
+    }
+
+    .btn--text:active {
+      background: var(--color-surface-muted);
+    }
+
+    /* Review state switcher: preview only; hidden on phones and during capture. */
+    .review-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--space-xs);
+      max-width: var(--device-width);
+      font-size: 0.8125rem;
+    }
+
+    .review-bar::before {
+      content: "State";
+      align-self: center;
+      margin-right: var(--space-xs);
+      color: var(--color-text-muted);
+    }
+
+    .review-bar button {
+      min-height: 32px;
+      padding: 0 var(--space-sm);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      background: var(--color-surface);
+      cursor: pointer;
+    }
+
+    .review-bar button[aria-pressed="true"] {
+      border-color: var(--color-text);
+      background: var(--color-text);
+      color: var(--color-surface);
+    }
+
+    @media (max-width: 430px) {
+      body {
+        justify-content: flex-start;
+        padding: 0;
+      }
+
+      .device {
+        width: 100%;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .review-bar {
+        display: none;
+      }
+    }
+
+    /* ?capture=1: exactly one 390×844 frame for Figma, no chrome or motion. */
+    html[data-capture] body {
+      display: block;
+      width: var(--device-width);
+      height: var(--device-height);
+      min-height: 0;
+      padding: 0;
+      overflow: hidden;
+      background: var(--color-surface);
+    }
+
+    html[data-capture] .device {
+      width: var(--device-width);
+      height: var(--device-height);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    html[data-capture] .review-bar {
+      display: none;
+    }
+
+    html[data-capture] *,
+    html[data-capture] *::before,
+    html[data-capture] *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+
+    .onboarding__top {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 var(--space-sm);
+    }
+
+    .onboarding__top .btn {
+      width: auto;
+    }
+
+    .onboarding__art {
+      display: grid;
+      place-items: center;
+      height: 320px;
+      margin: var(--space-md) 0 var(--space-xl);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface-muted);
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+    }
+
+    .onboarding__title {
+      margin: 0 0 var(--space-sm);
+      font-size: 1.75rem;
+      line-height: 1.2;
+    }
+
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-sm);
+      margin: 0 0 var(--space-sm);
+      padding: 0;
+      list-style: none;
+    }
+
+    .dots li {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--color-border);
+      transition: width 0.2s ease, background 0.2s ease;
+    }
+
+    .dots li[aria-current="step"] {
+      width: 24px;
+      background: var(--color-primary);
+    }
+
+    .onboarding__nav {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: var(--space-sm);
+    }
+  </style>
+</head>
+<body>
+  <div class="device" id="device" data-screen="onboarding-step" data-states="step-1 step-2 step-3">
+    <main class="screen">
+      <div class="onboarding__top">
+        <button type="button" class="btn btn--text" id="skip">Skip</button>
+      </div>
+
+      <section class="screen__body" aria-live="polite">
+        <div class="onboarding__art" aria-hidden="true">Illustration</div>
+        <h1 class="onboarding__title" id="step-title">Step title</h1>
+        <p class="muted" id="step-body">Step copy.</p>
+      </section>
+
+      <footer class="screen__footer">
+        <ol class="dots" aria-label="Progress" id="dots"></ol>
+        <div class="onboarding__nav">
+          <button type="button" class="btn btn--secondary" id="back">Back</button>
+          <button type="button" class="btn" id="next">Next</button>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <nav class="review-bar" aria-label="Review states"></nav>
+
+  <script>
+    // State scaffold (same in every template): ?state=<id> picks one of the
+    // ids in #device[data-states]; ?capture=1 strips review chrome for Figma.
+    const device = document.getElementById("device");
+    const STATES = device.dataset.states.trim().split(/\s+/);
+    const params = new URLSearchParams(location.search);
+    if (params.has("capture")) document.documentElement.setAttribute("data-capture", "");
+
+    const reviewButtons = STATES.map((id) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = id;
+      button.addEventListener("click", () => setState(id));
+      document.querySelector(".review-bar").append(button);
+      return button;
+    });
+
+    function setState(id, { interactive = false } = {}) {
+      const state = STATES.includes(id) ? id : STATES[0];
+      const previous = device.dataset.state;
+      device.dataset.state = state;
+      render(state, { previous, interactive });
+      for (const button of reviewButtons) {
+        button.setAttribute("aria-pressed", String(button.textContent === state));
+      }
+      try {
+        const url = new URL(location.href);
+        url.searchParams.set("state", state);
+        history.replaceState(null, "", url);
+      } catch {
+        // Sandboxed previews (for example Canvas) may block URL updates.
+      }
+    }
+
+    const STEPS = [
+      { title: "Welcome", body: "One sentence on the value of the product." },
+      { title: "How it works", body: "One sentence on the key mechanic." },
+      { title: "You're all set", body: "One sentence on what happens next." },
+    ];
+    const dots = document.getElementById("dots");
+    const back = document.getElementById("back");
+    const next = document.getElementById("next");
+    const skip = document.getElementById("skip");
+    dots.append(...STEPS.map((_, index) => {
+      const dot = document.createElement("li");
+      dot.setAttribute("aria-label", `Step ${index + 1} of ${STEPS.length}`);
+      return dot;
+    }));
+
+    const stepIndex = () => STATES.indexOf(device.dataset.state);
+
+    function render(state) {
+      const index = STATES.indexOf(state);
+      const last = index === STATES.length - 1;
+      document.getElementById("step-title").textContent = STEPS[index].title;
+      document.getElementById("step-body").textContent = STEPS[index].body;
+      dots.querySelectorAll("li").forEach((dot, dotIndex) => {
+        if (dotIndex === index) dot.setAttribute("aria-current", "step");
+        else dot.removeAttribute("aria-current");
+      });
+      back.disabled = index === 0;
+      skip.style.visibility = last ? "hidden" : "";
+      next.textContent = last ? "Get started" : "Next";
+    }
+
+    back.addEventListener("click", () => setState(STATES[stepIndex() - 1], { interactive: true }));
+    next.addEventListener("click", () => {
+      if (stepIndex() < STATES.length - 1) setState(STATES[stepIndex() + 1], { interactive: true });
+    });
+    skip.addEventListener("click", () => setState(STATES[STATES.length - 1], { interactive: true }));
+
+    setState(params.get("state") ?? STATES[0]);
+  </script>
+</body>
+</html>

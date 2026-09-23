@@ -1,0 +1,27 @@
+{
+  "name": "design-team",
+  "version": "0.6.0",
+  "description": "Design request workflow for mobile teams — research and a clickable HTML prototype in one turn, feedback-logged iterations, and per-state export into the designer's Figma file. One prototypes/<slug>/ folder per request.",
+  "author": {
+    "name": "GoTo Design Team"
+  },
+  "keywords": [
+    "design-request",
+    "design-research",
+    "html-prototype",
+    "canvas-artifact",
+    "mobile",
+    "design",
+    "figma",
+    "figjam",
+    "prototype",
+    "iteration",
+    "figma-export",
+    "export-to-figma",
+    "react-native",
+    "swiftui",
+    "android"
+  ],
+  "logo": "assets/logo.svg",
+  "repository": "https://github.com/jetsemrick/goto"
+}
