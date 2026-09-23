@@ -1,18 +1,18 @@
 {
-  "name": "goto-private-plugins",
+  "name": "goto",
   "owner": {
-    "name": "GoTo Design Team"
+    "name": "GoTo"
   },
   "metadata": {
-    "description": "Private Cursor plugins for GoTo teams",
-    "version": "0.6.0"
+    "description": "GoTo team marketplace of private Cursor plugins",
+    "version": "0.7.0"
   },
   "plugins": [
     {
-      "name": "design-team",
-      "source": "cursor-design-team-plugin",
+      "name": "design",
+      "source": "design",
       "description": "Research, prototype, iterate, and export mobile design requests.",
-      "version": "0.6.0"
+      "version": "0.7.0"
     }
   ]
 }

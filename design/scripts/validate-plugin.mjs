@@ -50,16 +50,16 @@ const parseName = (path) => {
 
 const requiredFiles = [
   ".cursor-plugin/marketplace.json",
-  "cursor-design-team-plugin/.cursor-plugin/plugin.json",
-  "cursor-design-team-plugin/README.md",
-  "cursor-design-team-plugin/assets/logo.svg",
-  "cursor-design-team-plugin/agents/design-research-verifier.md",
-  "cursor-design-team-plugin/skills/design-request/SKILL.md",
-  "cursor-design-team-plugin/skills/design-export-figma/SKILL.md",
-  "cursor-design-team-plugin/skills/inspect-design/SKILL.md",
-  "cursor-design-team-plugin/skills/design-prototype/templates/notes.md",
-  "cursor-design-team-plugin/skills/design-research/templates/research.md",
-  "cursor-design-team-plugin/skills/design-iterate/templates/feedback.md",
+  "design/.cursor-plugin/plugin.json",
+  "design/README.md",
+  "design/assets/logo.svg",
+  "design/agents/design-research-verifier.md",
+  "design/skills/design-request/SKILL.md",
+  "design/skills/design-export-figma/SKILL.md",
+  "design/skills/inspect-design/SKILL.md",
+  "design/skills/design-prototype/templates/notes.md",
+  "design/skills/design-research/templates/research.md",
+  "design/skills/design-iterate/templates/feedback.md",
 ];
 
 const starterTemplates = [
@@ -72,7 +72,7 @@ const starterTemplates = [
 ];
 for (const starter of starterTemplates) {
   requiredFiles.push(
-    `cursor-design-team-plugin/skills/design-prototype/templates/${starter}.html`,
+    `design/skills/design-prototype/templates/${starter}.html`,
   );
 }
 
@@ -143,7 +143,7 @@ if (!/^\d+\.\d+\.\d+$/.test(manifest.version ?? "")) {
   fail("plugin.json version must be semantic x.y.z");
 }
 if (manifest.mcpServers || manifest.variables) {
-  fail("Design Team must not declare a duplicate Figma MCP or auth variables");
+  fail("Design must not declare a duplicate Figma MCP or auth variables");
 }
 
 if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(marketplace.name ?? "")) {
@@ -177,8 +177,8 @@ const marketplaceEntry = marketplace.plugins?.find(
 if (!marketplaceEntry) {
   fail(`marketplace does not list plugin ${manifest.name}`);
 } else {
-  if (marketplaceEntry.source !== "cursor-design-team-plugin") {
-    fail("design-team marketplace source must be cursor-design-team-plugin");
+  if (marketplaceEntry.source !== "design") {
+    fail("design marketplace source must be design");
   }
   if (marketplaceEntry.version !== manifest.version) {
     fail("marketplace and plugin versions must match");
@@ -267,18 +267,18 @@ for (const [type, expected] of Object.entries(expectedNames)) {
 }
 
 const forbiddenFiles = [
-  "cursor-design-team-plugin/mcp.json",
-  "cursor-design-team-plugin/agents/design-request-agent.md",
-  "cursor-design-team-plugin/commands/design-request.md",
-  "cursor-design-team-plugin/skills/design-publish-figma/SKILL.md",
-  "cursor-design-team-plugin/skills/design-request-research/SKILL.md",
-  "cursor-design-team-plugin/skills/design-prototype-html/SKILL.md",
-  "cursor-design-team-plugin/skills/design-iterate-feedback/SKILL.md",
-  "cursor-design-team-plugin/skills/figma-inspect-handoff/SKILL.md",
-  "cursor-design-team-plugin/skills/figma-design-to-code/SKILL.md",
-  "cursor-design-team-plugin/skills/figma-code-connect/SKILL.md",
-  "cursor-design-team-plugin/prototypes/_template-v1.html",
-  "cursor-design-team-plugin/prototypes/_template-notes.md",
+  "design/mcp.json",
+  "design/agents/design-request-agent.md",
+  "design/commands/design-request.md",
+  "design/skills/design-publish-figma/SKILL.md",
+  "design/skills/design-request-research/SKILL.md",
+  "design/skills/design-prototype-html/SKILL.md",
+  "design/skills/design-iterate-feedback/SKILL.md",
+  "design/skills/figma-inspect-handoff/SKILL.md",
+  "design/skills/figma-design-to-code/SKILL.md",
+  "design/skills/figma-code-connect/SKILL.md",
+  "design/prototypes/_template-v1.html",
+  "design/prototypes/_template-notes.md",
 ];
 for (const file of forbiddenFiles) {
   if (existsSync(join(repoRoot, file))) fail(`Forbidden stale file: ${file}`);
