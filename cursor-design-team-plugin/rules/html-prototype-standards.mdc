@@ -1,83 +1,57 @@
 ---
-description: Mobile-first HTML canvas prototype conventions — viewport, safe areas, semantic structure, versioning.
+description: Conventions for design-request HTML prototypes in prototypes/<slug>/ — fixed 390×844 frame, ?state= states, capture mode, safe areas, touch targets, versioning.
 alwaysApply: false
-globs: ["**/*.html", "**/prototypes/**"]
+globs: ["**/prototypes/**/*.html"]
 ---
 
 # HTML prototype standards
 
-Apply when creating or editing design request HTML canvas artifacts.
+Apply when creating or editing `prototypes/<slug>/index.html`. Starters live
+in the `design-prototype` skill's `templates/` folder.
 
-## File requirements
+## File
 
-- **Self-contained:** Single `.html` file with inline `<style>`; avoid external CSS/JS dependencies in MVP.
-- **No build step:** Designer opens file or canvas preview directly in Cursor.
-- **Version header:** HTML comment block with prototype name, semver, and changelog line.
+- One self-contained file: inline `<style>` and `<script>`, no external
+  scripts, fonts, or network calls; inline SVG for icons.
+- Version comment in `<head>`: prototype, slug, version, starter, states,
+  changelog line.
+- `index.html` is always the latest version; every version is also saved as
+  `history/<version>.html`.
 
-## Mobile-first viewport
+## Frame and states
 
-```html
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-```
-
-- Design width: **390px** (iPhone 14/15 baseline) unless brief specifies otherwise.
-- Center frame on larger viewports with neutral background (`#f5f5f5` or similar).
-- Use `max-width: 390px; margin: 0 auto; min-height: 100dvh;` on root app container.
+- `#device` is a fixed 390×844 frame on desktop and fills the viewport on
+  phones (`max-width: 430px`).
+- `data-states` on `#device` lists every state id. `render(state)` derives the
+  whole screen from the id, so `?state=<id>` is deterministic.
+- `?capture=1` renders only the 390×844 frame: no review bar, no shadow, no
+  motion. Export depends on it.
+- The review bar ("State" switcher) sits outside `#device`.
 
 ## Safe areas
 
-```css
-padding-top: env(safe-area-inset-top, 0);
-padding-bottom: env(safe-area-inset-bottom, 0);
-padding-left: env(safe-area-inset-left, 0);
-padding-right: env(safe-area-inset-right, 0);
-```
+- Top: `max(env(safe-area-inset-top, 0px), 47px)`; bottom CTAs:
+  `max(env(safe-area-inset-bottom, 0px), 34px)` plus spacing. Use `max()`, not a
+  sum, so real devices are not double-padded.
 
-- Reserve **~34px** bottom inset for home indicator on primary CTAs.
-- Status bar region: avoid critical content under notch; use top padding ≥ 47px when simulating iOS chrome.
+## Touch and accessibility
 
-## Touch & accessibility
+- Touch targets 48px (meets 44pt iOS and 48dp Android).
+- Semantic elements; visible `:focus-visible`; body text contrast at least WCAG AA.
+- Sheets and dialogs: opacity-faded backdrop (no `hidden`), `inert` when
+  closed, background `inert` when open, Escape closes, focus moves in and
+  returns to the opener.
+- Use the `hidden` attribute for whole views; the base CSS forces
+  `[hidden] { display: none !important; }`.
 
-- Minimum tap target: **44×44px** (prefer 48px for primary actions).
-- Use semantic elements: `button`, `a`, `input`, `label`, `main`, `header`, `nav`.
-- Interactive controls need visible `:focus-visible` styles.
-- Color contrast ≥ WCAG AA for body text; note if placeholder contrast is intentionally lower.
+## Style
 
-## Structure for designer review
-
-Prefer clear regions designers can map to Figma frames later:
-
-```html
-<main class="screen" data-screen="checkout-nudge">
-  <header class="screen__header">...</header>
-  <section class="screen__body">...</section>
-  <footer class="screen__footer">...</footer>
-</main>
-```
-
-- Use `data-state` attributes or classes for variant demos (`is-open`, `has-error`).
-- Comment major sections in HTML for handoff readability.
-
-## Interactions (MVP)
-
-- Vanilla JS only; keep scripts inline at bottom of `<body>`.
-- Demo interactions: sheet open/close, tab switch, fake form validation — no API calls.
-- Prefer CSS transitions over heavy animation libraries.
-
-## Versioning & iteration
-
-- Semver in HTML comment: `1.0.0` initial, patch for fixes, minor for new states/sections.
-- Mirror changelog in companion `*-notes.md` — never delete prior entries.
-- When iterating, summarize "feedback addressed" in notes file.
-
-## Typography & color
-
-- Use system font stack unless brand fonts specified: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`.
-- Define CSS custom properties for colors/spacing at `:root` for easy iteration.
-- Document token names in notes even when not synced from a design token file.
+- System font stack unless the brief names brand fonts.
+- Tokens in `:root`; change values, keep names stable across iterations.
+- Label placeholder copy in `notes.md` open questions.
 
 ## Do not
 
-- Desktop-first layouts or min-width breakpoints above 390px as primary target.
-- External CDN scripts (React, Tailwind) unless user explicitly requests.
-- Lorem ipsum without labeling placeholder copy in notes open questions.
+- Desktop-first layouts or breakpoints above 390px as the primary target.
+- CDN frameworks (React, Tailwind) unless the designer asks.
+- Remove the state scaffold or capture CSS.

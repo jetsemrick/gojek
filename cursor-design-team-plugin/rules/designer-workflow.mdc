@@ -1,67 +1,37 @@
 ---
-description: Designer-first Cursor workflow — design request research, HTML canvas prototypes, iteration; Figma/FigJam as secondary research inputs.
+description: Designer-first defaults for the design-team plugin — HTML prototypes before Figma polish, one screen at a time, review checklist before export.
 alwaysApply: false
 ---
 
 # Designer workflow in Cursor
 
-This plugin is for **designers**. The primary flow is **design request → research → HTML prototype → iterate**. Default to research summaries and canvas HTML artifacts, not deep engineering codegen.
+This plugin is for **designers**. Default to a sourced `research.md` and a
+clickable HTML prototype, not engineering code. Routing, the request folder,
+and checkpoints are defined in `design-request-workflow`.
 
-## Primary workflow
+## Defaults
 
-| Step | Skill | Output |
-| --- | --- | --- |
-| 1. Research | `design-research` | Inspiration & pattern summary |
-| 2. Prototype | `design-prototype` | Mobile HTML canvas artifact |
-| 3. Iterate | `design-iterate` | Updated artifact + changelog |
-| 4. Export (optional) | `design-export-figma` | Captured Figma Design URL |
+1. **Fast path** — research and prototype in one turn; research first only
+   when the designer asks or the brief is ambiguous and high-stakes.
+2. **HTML before Figma** — the prototype is the review vehicle; Figma is the
+   export destination.
+3. **One screen at a time** — expand to a flow only when asked.
+4. **Every round is versioned** — feedback logged with IDs, snapshot in
+   `history/`, changelog in `notes.md`.
+5. **Preserve design intent** — flag ambiguities instead of making product
+   decisions.
 
-Run the complete workflow with checkpoints: load `design-request` with a brief.
-`design-request` is the sole orchestrator.
+## Review checklist (before export)
 
-## Secondary capabilities (Figma / FigJam)
+- [ ] Prototype matches the brief and `research.md` scope
+- [ ] Every state in `notes.md` renders from `?state=<id>` in the 390×844 frame
+- [ ] Touch targets 48px (meets 44pt iOS / 48dp Android); focus states visible
+- [ ] No open `P1` items in `feedback.md`
+- [ ] Designer has supplied the Figma file link for this export
+- [ ] Official Figma plugin and OAuth preflight passes
 
-| Designer intent | Use |
-| --- | --- |
-| Existing team frame specs | `inspect-design` skill |
-| Workshop board summary | `figjam-summary` skill |
-| Verify public/mobile research | `design-research-verifier` agent |
-| Figma skills or Code Connect | Official Figma plugin (`/add-plugin figma`) |
-| Capture approved HTML | `design-export-figma` skill |
+## Out of scope
 
-Use Figma/FigJam during **research** when URLs are available — not as a substitute for HTML prototypes.
-Do not bundle copies of official Figma skills.
-
-## Default behavior
-
-1. **Research before prototype** — Gather inspiration and scope unless user skips research.
-2. **HTML before Figma polish** — Canvas artifact is the review vehicle for MVP.
-3. **One screen at a time** — Prototype focused flows; expand when asked.
-4. **Version iterations** — Every feedback round updates changelog and version comment.
-5. **Preserve design intent** — Call out ambiguities instead of guessing product decisions.
-
-## Review checklist (before Figma capture)
-
-- [ ] Prototype matches brief and research scope
-- [ ] 390px mobile viewport and safe areas verified
-- [ ] Interactive states documented (default, error, empty as scoped)
-- [ ] Touch targets ≥ 44px; focus states visible
-- [ ] Changelog and open questions up to date in companion notes
-- [ ] Platform-specific variants noted if applicable
-- [ ] Official Figma plugin and OAuth preflight passes for export
-
-## What not to do in MVP
-
-- Do not sync or export design tokens (no token path configured).
-- Do not scaffold full apps, navigation stacks, or CI pipelines unless explicitly requested.
-- Do not replace Figma for final polish — HTML prototype precedes Figma refinement.
-- Do not default to Figma-handoff-only when a design **request** is submitted.
-- Do not configure Figma PAT/Bearer auth or a second Figma MCP server.
-
-## Example prompts (designer-friendly)
-
-- "Design request: mobile savings nudge at checkout — bottom sheet, trust copy, 390px"
-- "Research sticky CTA patterns above home indicator on iOS"
-- "Prototype the login screen from research — email, SSO, error state"
-- "Iterate on prototypes/login-v1.html — shorten headline, add forgot password link"
-- "Inspect our existing login frame for reference: [Figma URL]" (secondary)
+- Design-token sync, full app scaffolds, or CI pipelines.
+- Replacing Figma for final polish.
+- Figma PAT/Bearer auth or a second Figma MCP server.

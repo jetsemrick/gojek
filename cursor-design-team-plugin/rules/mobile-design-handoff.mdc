@@ -1,7 +1,6 @@
 ---
 description: Mobile design handoff conventions for Figma frames — safe areas, touch targets, and platform patterns (React Native, SwiftUI, Android).
 alwaysApply: false
-globs: ["**/*.{tsx,jsx,swift,kt,kts}"]
 ---
 
 # Mobile design handoff
