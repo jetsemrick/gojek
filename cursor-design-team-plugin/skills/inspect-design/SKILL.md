@@ -1,6 +1,6 @@
 ---
 name: inspect-design
-description: Inspect a Figma frame or layer and produce mobile-friendly handoff notes. Load when the user provides a Figma Design URL for inspect, spec, or handoff.
+description: Read a Figma Design frame or layer and write mobile handoff or review notes (layout, type, color, components, touch targets, safe areas). Use when a designer pastes a figma.com/design link with a node-id and asks to "inspect this frame", "spec this", "write handoff notes", "review spacing on…", or "what components does this use", or shares a Figma frame as research input. Not for exporting or pushing a prototype to Figma (use design-export-figma), implementing a Figma design as code (the official Figma plugin handles that), or FigJam boards (use figjam-summary).
 ---
 
 # Inspect design
@@ -93,7 +93,7 @@ Use this template:
 - Frame width matches a known device preset?
 - Bottom CTAs clear home indicator inset?
 - Text scales — any truncation risk at smaller devices?
-- Tap targets ≥ 44pt?
+- Tap targets at least 44pt (iOS) / 48dp (Android)?
 
 ### 5. Review mode (optional)
 

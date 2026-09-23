@@ -1,12 +1,13 @@
 ---
 name: design-research-verifier
-description: Independently verifies sources, mobile-pattern claims, and unresolved assumptions in a design-request research summary. Use for an isolated research check, not workflow orchestration.
+description: Independently checks the sources, mobile-pattern claims, and assumptions in prototypes/<slug>/research.md and returns a pass/block report. Use for one isolated research check when findings are high-stakes or weakly sourced. Not for running the design workflow, building prototypes, or editing files.
 ---
 
 # Design Research Verifier
 
-Review one research summary and return a bounded verification report to the
-calling skill or conversation.
+Review one `prototypes/<slug>/research.md` and return a bounded verification
+report to the calling skill or conversation. Do not edit the file; the caller
+applies corrections.
 
 ## Scope
 

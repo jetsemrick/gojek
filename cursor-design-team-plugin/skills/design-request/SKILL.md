@@ -1,60 +1,107 @@
 ---
 name: design-request
-description: Sole orchestrator for research, HTML prototype, feedback iteration, and optional Figma export. Load when the user starts a full design request workflow.
+description: Default entry point for a new mobile design brief. Researches, builds a clickable HTML prototype in the same turn, then iterates and exports to Figma, keeping everything in prototypes/<slug>/. Use when a designer says "design a…", "I need a screen for…", "can you mock up…", "new design request", "prototype a bottom sheet for…", "research first, then prototype…", or "continue <slug>" / "pick up the checkout nudge". Not for feedback on an existing prototype (use design-iterate), exporting or pushing an approved prototype to Figma (use design-export-figma), inspecting a Figma frame (use inspect-design), or summarizing a FigJam board (use figjam-summary).
 ---
 
-# Design request (full workflow)
+# Design request
 
-Orchestrate the end-to-end design request workflow. Do not delegate ownership of
-the multi-turn workflow to a subagent.
+Own the whole request in the main conversation: research, prototype, iterate,
+export. Never hand the workflow to a subagent.
 
-## When to use
+## Request folder
 
-- A new design brief arrives and the user wants the full four-phase flow.
-- User asks to run research, prototype, iterate, and optionally export in one thread.
-- Phrases like "design request", "run the full workflow", or "research then prototype".
+Every request lives in one folder. Create it on intake; read it on resume.
 
-## Stages
+```text
+prototypes/<slug>/
+├── research.md          # sources, patterns, recommended starter and states
+├── index.html           # current prototype (always the latest version)
+├── notes.md             # version, states table, changelog, Figma export record
+├── feedback.md          # feedback log: ID, source, priority, status
+└── history/<version>.html   # snapshot of every version, e.g. history/1.0.0.html
+```
 
-| # | Stage | Skill to load | Output |
-| --- | --- | --- | --- |
-| 1 | Research | `design-research` | Research summary |
-| 2 | Prototype | `design-prototype` | HTML canvas artifact + notes |
-| 3 | Iterate | `design-iterate` | Updated artifact (when feedback provided) |
-| 4 | Export to Figma | `design-export-figma` | Figma file/frame URL (when approved) |
+- `<slug>` is short kebab-case from the brief, for example `checkout-savings-nudge`.
+- If the folder already exists, resume it. Never overwrite a request folder.
+- Use the team's path instead of `prototypes/` only if the designer names one.
 
-## Steps
+## Resume ("continue <slug>")
 
-1. **Intake** — Parse brief; clarify once if needed.
-2. **Research** — Load `design-research`; gather inspiration, patterns, optional Figma/FigJam context.
-3. **Checkpoint** — Confirm before prototype unless user asked to run through.
-4. **Prototype** — Load `design-prototype`; self-contained mobile HTML per `html-prototype-standards`.
-5. **Review** — Share preview instructions; collect feedback.
-6. **Iterate** — Load `design-iterate` or continue in same thread with feedback.
-7. **Export** — When approved, load `design-export-figma` with the HTML path.
+Read `notes.md`, `feedback.md`, and `research.md`. Reply with the current
+version, open feedback IDs, and the last Figma export (if any), then offer the
+numbered options for the phase it is in.
 
-Before any Figma-dependent work, apply the Figma preflight from the selected
-skill. Missing official plugin capabilities or OAuth is a hard stop for that
-work; it does not block HTML-only research, prototype, or iteration.
+## Fast path (default)
 
-## Rules and optional verifier
+Run research and prototype in **one turn** with a single checkpoint at the end.
 
-- Rules: `design-request-workflow`, `html-prototype-standards`
-- Optional isolated research check: `design-research-verifier` agent
+1. **Intake.** Derive the slug, platform (mobile by default), and the one
+   screen or flow to build. Ask one clarifying question only if the brief has no
+   identifiable screen or goal; otherwise state assumptions and continue.
+2. **Research.** Follow `design-research` in compact mode. Write
+   `prototypes/<slug>/research.md`.
+3. **Prototype.** Follow `design-prototype`. Copy the recommended starter,
+   write `index.html`, `notes.md`, `feedback.md`, and `history/1.0.0.html`.
+4. **Preview.** Canvas first, local server as fallback (see `design-prototype`).
+5. **Checkpoint.** Summarize research in three bullets or fewer, list states,
+   note assumptions, then end with the prototype options below.
 
-`design-research-verifier` returns a bounded report. It never orchestrates the
-workflow or owns designer feedback loops.
+If the official Figma plugin tools are not in your tool list, add one line at
+the checkpoint: export will need `/add-plugin figma` and OAuth. Do not block.
 
-## Related skills
+### Research first (opt-in)
 
-- `design-research` — research only
-- `design-prototype` — prototype only
-- `design-iterate` — apply feedback to existing artifact
-- `design-export-figma` — export approved HTML to Figma
-- `inspect-design` — Figma frame inspect (secondary research input)
-- `figjam-summary` — FigJam board summary (secondary research input)
+If the designer says "research first", "just research", "don't build yet", or
+the brief is high-stakes and ambiguous, stop after `research.md` and end with:
+
+```text
+1. Build the prototype with the <starter> starter
+2. Change the scope — tell me what to add or cut
+3. Dig deeper into <top open question>
+```
+
+## Numbered options
+
+Every phase ends with numbered options. The designer can reply with a digit or
+free text. Fill in the specifics; keep it to three to five options.
+
+After the prototype or an iteration:
+
+```text
+1. Approve and export to Figma — paste the Figma file link to export into
+2. Change something — describe it (logged in feedback.md)
+3. Add a state — name it
+4. Compare with v<previous> (history/<previous>.html)   ← after iterations only
+```
+
+After an export:
+
+```text
+1. Keep iterating — describe the change
+2. Export again later (new version or more states) — needs a Figma file link
+3. Done for now
+```
+
+## Phase routing
+
+| Designer reply | Do |
+| --- | --- |
+| Changes, comments, test notes, "make the CTA bigger" | Follow `design-iterate` |
+| "Approve", "export", "push to Figma", a Figma file link | Follow `design-export-figma` |
+| New screen in the same request | New prototype in the same folder only if the designer asks; otherwise a new slug |
+
+Figma-dependent steps run the official Figma plugin preflight from the skill
+that needs it. A failed preflight blocks only that step; research, prototyping,
+and iteration keep working.
+
+## Optional verifier
+
+For high-stakes or weakly sourced research, the `design-research-verifier`
+agent can check `research.md` once and return a report. It does not edit
+files or run later phases.
 
 ## Example prompts
 
-- "Design request: mobile onboarding for a savings app — 3 steps, trust signals, optional biometrics, 390px mobile. Research public patterns first, then HTML prototype."
-- "Run the full design workflow for a checkout savings nudge bottom sheet."
+- "Design a savings nudge bottom sheet for checkout — dismissible, trust copy."
+- "I need an onboarding step for enabling biometrics. Research first."
+- "Continue checkout-savings-nudge."

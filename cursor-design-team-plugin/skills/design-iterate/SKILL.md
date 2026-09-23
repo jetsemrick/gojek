@@ -1,109 +1,82 @@
 ---
 name: design-iterate
-description: Apply feedback to refine an HTML canvas prototype — Phase 3 of the design request workflow. Load when the user provides feedback on an existing prototype.
+description: Apply feedback to an existing HTML prototype in prototypes/<slug>/, logging every item in feedback.md with an ID, source (designer, engineer, user test), priority, and status, and snapshotting each version to history/. Use when a designer says "make the CTA bigger", "change the headline", "engineering said…", "from user testing…", "add an error state", "iterate on…", pastes review or Figma comments, or picks "change something" at a checkpoint. Not for new briefs (use design-request), first builds (use design-prototype), or exporting to Figma (use design-export-figma).
 ---
 
-# Design iterate (feedback)
+# Design iterate
 
-Run **Phase 3 (Iterate)** — incorporate feedback and update the HTML prototype.
-
-## When to use
-
-- An HTML prototype exists and feedback has arrived.
-- Phase 3 of `design-request`, or the user asks to iterate/refine a prototype.
-- Designer wants a revised canvas artifact with tracked changes.
-
-Primary output is an **updated HTML file** plus **changelog entry**.
+Log the feedback, change the prototype, keep every version.
 
 ## Inputs
 
-Required:
-1. **Artifact path** — e.g. `prototypes/savings-nudge-v1.html`
-2. **Feedback** — bullets, comments, screenshots described in text, or linked review notes
+- The request: a slug, a path in `prototypes/<slug>/`, or the request already
+  in the conversation. If it is ambiguous, list the folders in `prototypes/`
+  and ask once.
+- Feedback in any form: chat bullets, pasted Figma comments, user-test notes,
+  a review doc, or a FigJam link (summarize it with `figjam-summary` first).
 
-Optional:
-- Priority labels (must-fix vs nice-to-have)
-- New states or copy from design review
+## 1. Load the request
 
-If artifact path is missing, ask once. If feedback is empty, ask what to change.
+Read `index.html`, `notes.md` (current version, states), and `feedback.md`
+(open items). Create `feedback.md` from `templates/feedback.md` next to this
+SKILL.md if it is missing.
 
-## Workflow
+## 2. Log before editing
 
-Load `html-prototype-standards` rule.
+Append one row per distinct item to `feedback.md`:
 
-### 1. Load current artifact
-
-Read the HTML file and companion notes (if present). Note current version from file comment or notes.
-
-### 2. Triage feedback
-
-Group feedback into:
-| Category | Examples |
+| Field | Rule |
 | --- | --- |
-| Layout | spacing, alignment, sticky footer |
-| Visual | color, typography, icon size |
-| Interaction | new state, animation, sheet behavior |
-| Content | copy, labels, error messages |
-| A11y / mobile | tap target, contrast, safe area |
+| ID | Next `F-###`; never reuse or renumber |
+| Source | `designer` by default; `engineer`, `user test`, or `stakeholder` when the designer attributes it ("eng said…", "in testing…") |
+| Feedback | Short quote or faithful paraphrase |
+| Priority | `P1` must fix, `P2` should fix (default), `P3` nice to have; infer from wording |
+| Status | `open` until handled |
 
-Resolve conflicts explicitly — if feedback contradicts earlier brief, flag and ask.
+Say which source and priority you inferred so the designer can correct them.
+If an item conflicts with the brief, `research.md`, or an earlier item, flag it
+and ask instead of guessing.
 
-### 3. Apply changes incrementally
+## 3. Apply changes
 
-- Preserve working structure; avoid full rewrites unless requested.
-- Follow `html-prototype-standards` for all edits.
-- Bump **patch version** for small fixes, **minor** for new states/sections.
+1. Make sure `history/<current version>.html` exists; copy `index.html` there
+   if it does not.
+2. Edit `index.html` in place. Preserve the scaffold (`#device`,
+   `data-states`, `render`, capture CSS, review bar) and the standards in
+   `design-prototype`.
+3. Bump the version: patch for fixes and copy, minor for new states or
+   sections, major only for a requested redesign. Update the version comment.
+4. If states changed, update `data-states`, `render`, and the States table in
+   `notes.md` together.
+5. Copy the result to `history/<new version>.html`.
 
-Update version comment in HTML:
+## 4. Close the loop
 
-```html
-<!--
-  Prototype: [Screen name]
-  Version: 1.1.0
-  Changelog: [short summary of this iteration]
--->
-```
+- In `feedback.md`, set each handled item to `done`, `deferred`, or `won't do`
+  and fill **Version** with the new version. Add a note for anything not done.
+- In `notes.md`, add a changelog entry that cites IDs:
 
-Prefer updating in place (`*-v1.html`) unless user asks for versioned copies; if copying, use `*-v1.1.html` and note in changelog.
+  ```markdown
+  ### 1.1.0 — YYYY-MM-DD
+  - Sticky CTA above the home indicator (F-003)
+  - Added `error` state (F-004)
+  - Snapshot: `history/1.1.0.html`
+  ```
 
-### 4. Update changelog
+## 5. Report
 
-Append to companion notes:
-
-```markdown
-### 1.1.0 — [date]
-- [Change] — addresses: "[feedback quote or paraphrase]"
-- ...
-```
-
-Include a **Feedback addressed** table when helpful:
-
-| Feedback | Status | Notes |
-| --- | --- | --- |
-| Increase CTA tap area | Done | min-height 48px |
-| Add email error state | Done | shown on invalid submit |
-
-### 5. Summarize for reviewer
-
-Return short summary:
-- What changed (bullets)
-- What was deferred and why
-- How to preview updated artifact
-- Remaining open questions
-
-## Example prompts
-
-- "Iterate on prototypes/login-v1.html — CTA should be sticky; add forgot password link; error state for empty email."
-- "Designers said headline is too long — shorten and bump spacing above the form."
-- "Engineering feedback: use semantic button types and aria labels on the sheet close control."
+Reply with what changed (by ID), what is deferred and why, how to preview
+(Canvas first, local server fallback as in `design-prototype`), and the
+numbered options from `design-request`, including "Compare with v<previous>".
 
 ## Do not
 
-- Discard prior changelog history.
-- Apply feedback that breaks mobile viewport without noting the tradeoff.
-- Start research or unrelated new screens in this phase — scope to the existing artifact unless user expands.
+- Delete changelog entries, feedback rows, or history snapshots.
+- Break the 390×844 frame or the `?state=` convention without noting it.
+- Start new research or new screens unless the designer expands the scope.
 
-## Related
+## Example prompts
 
-- Full flow: `design-request`
-- New request: `design-research` or `design-request`
+- "Make the CTA sticky and add a forgot-password link."
+- "Engineering feedback: the close button needs an aria-label. P1."
+- "From user testing: 3 of 5 people missed the savings amount."

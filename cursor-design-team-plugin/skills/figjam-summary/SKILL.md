@@ -1,6 +1,6 @@
 ---
 name: figjam-summary
-description: Summarize a FigJam board into decisions, open questions, and action items. Load when the user provides a FigJam board URL.
+description: Summarize a FigJam board into decisions, themes, open questions, and action items. Use when a designer pastes a figma.com/board link and asks to "summarize this board", "what did we decide in the workshop", "pull action items from…", or turn workshop stickies into feedback for a prototype. Not for Figma Design frames (use inspect-design), exporting a prototype to Figma (use design-export-figma), or creating FigJam diagrams.
 ---
 
 # FigJam summary

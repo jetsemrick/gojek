@@ -1,149 +1,147 @@
 ---
 name: design-export-figma
-description: Capture an approved, locally served HTML prototype into Figma with the official generate_figma_design workflow. Load for the Export phase or when the user asks to export HTML to Figma.
+description: Export an approved HTML prototype from prototypes/<slug>/ into a Figma file the designer links, capturing every state as a 390×844 frame with generate_figma_design and recording a Figma link per state. Use when a designer says "export to Figma", "push to Figma", "send this to Figma", "put this in Figma", "capture the prototype in Figma", "approved, export it", or pastes a Figma file link after approving a prototype. Use this instead of the official figma-generate-design skill whenever the source is an HTML prototype in prototypes/. Not for building new screens in Figma from scratch, inspecting a Figma frame (use inspect-design), or editing the prototype (use design-iterate).
 ---
 
-# Export HTML prototype to Figma
+# Export prototype to Figma
 
-Run the **Export to Figma** stage: serve the approved HTML and capture its live
-browser rendering as editable Figma layers with `generate_figma_design`.
-Do not manually rebuild the DOM through `use_figma`.
+Capture the live, served prototype into the designer's Figma file as editable
+layers with `generate_figma_design`, one frame per state. Never rebuild the
+DOM by hand with `use_figma`.
 
-## Required preflight
+## 1. Preflight (write access)
 
-Figma access is supplied by Figma's official Cursor plugin; this plugin does not
-bundle Figma skills or an MCP server.
+Figma access comes from Figma's official Cursor plugin; this plugin bundles no
+Figma skills or MCP server.
 
-Before reading or writing Figma:
-
-1. Confirm the official skills `figma-use` and `figma-generate-design` are
-   available, and confirm the **remote** Figma MCP exposes
-   `generate_figma_design`.
-2. If any capability is missing, **stop**. Tell the user:
+1. Confirm the official `figma-use` and `figma-generate-design` skills are
+   available and the **remote** Figma MCP exposes `generate_figma_design` and
+   `use_figma`.
+2. If anything is missing, **stop** and tell the designer:
    1. Run `/add-plugin figma` in Cursor agent chat.
-   2. Reload Cursor so its tool list refreshes.
+   2. Reload Cursor so the tool list refreshes.
    3. Retry the export.
-3. If Figma is installed but disconnected, **stop**. Tell the user to open
-   **Customize → Plugins → Figma**, choose **Connect/Authenticate**, complete
-   the official Figma OAuth flow, then retry.
-4. Never request a Figma personal access token, add an Authorization header, or
-   configure the desktop MCP as a substitute. `generate_figma_design` is
-   remote-only.
+3. If a Figma call reports an auth error, **stop** and tell the designer to
+   open **Customize → Plugins → Figma**, choose **Connect/Authenticate**, finish
+   the Figma OAuth flow, and retry.
+4. Never ask for a personal access token, add an Authorization header, or use
+   the desktop MCP. `generate_figma_design` is remote-only.
 
-Do not start a local server or mutate the companion notes until this preflight
-passes.
+Start no server and write no files until the preflight passes.
 
-## Inputs
+## 2. Destination: the designer's Figma link
 
-- Required: approved HTML path, such as `prototypes/savings-nudge-v1.html`.
-- Optional: `--figma-file-key <key>` or a Figma Design URL for update mode.
-- Optional: a non-default state or element to capture.
+Every export needs a Figma Design URL that the designer gives **for this
+export**. Never guess a destination.
 
-If the artifact path is missing, ask once. If export is invoked explicitly,
-treat that as approval; otherwise confirm that the current prototype is approved.
+- If this request has no link yet, ask and stop:
+  "Paste the link to the Figma file to export into (in Figma: Share → Copy
+  link, or copy the browser URL)."
+- A link recorded in `notes.md` from an earlier export may be offered as a
+  numbered option ("1. Same file as last time: <url>"), but use it only after
+  the designer picks it.
+- Accept only `figma.com/design/<fileKey>/…` or `figma.com/file/<fileKey>/…`.
+  For `/board/` (FigJam), `/proto/`, `/slides/`, or anything else, ask for a
+  Figma Design file link. Figma creates a new file when the link is not a
+  Design file, so never pass one through.
+- Never create a new file, capture to drafts, or capture to the clipboard on
+  your own. Do those only when the designer explicitly asks in this request.
 
-## 1. Validate the artifact
+Permissions: any seat can edit files in its own drafts. Editing a file outside
+drafts needs a **Full seat** and **edit permission**. If Figma denies access,
+stop, report it, and ask for a link to a file the designer can edit.
 
-Read the HTML and companion `*-notes.md` when present.
+## 3. Validate the prototype
 
-- Confirm the file exists and is self-contained enough to render locally.
-- Confirm the expected mobile viewport and scoped state.
-- Extract the screen name and version for the export record.
-- Do not redesign the approved HTML during export.
+From `prototypes/<slug>/`, read `index.html` and `notes.md`.
 
-## 2. Serve and open the live page
+- Take the version from the version comment and the state ids from
+  `data-states` on `#device`. They must match the States table in `notes.md`.
+  If they differ, stop and fix the notes with the designer first.
+- Capture every listed state unless the designer names a subset.
+- If the export is not the designer's explicit request, confirm the prototype
+  is approved.
+- Do not edit `index.html` during export.
 
-`generate_figma_design` captures a **running browser page**, not HTML source.
+## 4. Capture from a temporary copy
 
-1. Reuse an already-running local server when it serves the approved artifact.
-2. Otherwise start a temporary local HTTP server rooted at the artifact's
-   directory on an available localhost port. One suitable fallback is:
+The capture flow injects a script into the served page. Keep the approved file
+untouched:
+
+1. Copy `index.html` to `prototypes/<slug>/.capture/index.html` (plus any
+   relative assets). All injection happens in `.capture/`.
+2. Serve the copy on an available localhost port:
 
    ```bash
-   python3 -m http.server <available-port> --directory <artifact-directory>
+   npx --yes serve -l <port> prototypes/<slug>/.capture
+   # or: python3 -m http.server <port> --directory prototypes/<slug>/.capture
    ```
 
-3. Verify the exact `http://localhost:<port>/<file>.html` URL renders.
-4. Ask the official Figma workflow to open that URL for live capture. Let the
-   tool inject its capture support and open the browser/capture toolbar.
-5. Keep the server running until capture completes, then stop only the server
-   started for this export.
+3. Check the port answers before capturing:
+   `curl -sI http://localhost:<port>/index.html` returns `200`.
 
-The HTML remains directly previewable under the plugin's existing Canvas /
-artifact assumption; local serving is specifically required for reliable
-browser capture and is also the retained preview fallback.
+## 5. Capture each state
 
-## 3. Capture with `generate_figma_design`
+Load the official `figma-generate-design` skill and follow its current
+parameters. For each state id, in `data-states` order:
 
-Load the official `figma-generate-design` skill before the tool call and follow
-its current parameters and capture instructions.
+1. Capture `http://localhost:<port>/index.html?state=<id>&capture=1` into the
+   designer's file with `generate_figma_design`. `capture=1` renders exactly one
+   390×844 frame with no review bar and no motion.
+2. Use a 390×844 browser viewport when the capture window allows it;
+   otherwise use **Select element** on `#device`.
+3. Wait for the tool to return before moving to the next state.
 
-| Mode | Input | Behavior |
-| --- | --- | --- |
-| Create | No file key/URL | Capture into a new Figma Design file in the selected team or organization drafts. |
-| Update | Existing Figma Design key/URL | Capture into that file as a new page/frame; do not overwrite an existing frame unless explicitly requested. |
+## 6. Name and place the frames
 
-For create mode, any Figma seat can create in drafts. For update mode:
+After capture, load `figma-use` and use `use_figma` only to organize:
 
-- Any seat may edit a file in its own drafts when allowed by Figma.
-- Editing an existing file outside drafts requires a **Full seat** and
-  **edit permission**.
-- If permission is denied, stop and report it. Offer, with user approval, to
-  capture to a new draft file or the clipboard; never silently switch targets.
+- Page: `Prototype exports / <slug>` (create it if missing).
+- Frame: `<slug> / <state> / v<version>`, for example
+  `checkout-savings-nudge / sheet-open / v1.2.0`.
+- Place new frames left to right in state order. Never overwrite or rename
+  frames from earlier exports.
+- Check that each frame is 390×844 and report any that are not.
+- Read back each frame's node id.
 
-Use the capture toolbar for the entire screen, selected elements, or additional
-states requested by the user. Complete the capture and wait for the MCP tool to
-return the resulting file/claim URL.
+Do not change captured layers. Design-system replacement is a separate
+refinement the designer must ask for.
 
-## 4. Optional post-capture refinement
+## 7. Record and clean up
 
-`use_figma` is **not** the HTML import path. Use it only after a successful
-`generate_figma_design` capture when the user asks for refinement, or when an
-explicitly scoped design-system pass is needed.
+1. Append one row per **successful** state to **Figma export record** in
+   `notes.md`:
 
-Before any `use_figma` call, load the official `figma-use` skill (and
-`figma-generate-design` when its workflow requires both). Keep the captured
-frame as the visual source of truth and describe any component/variable changes.
+   ```markdown
+   | 2026-09-23 | 1.2.0 | sheet-open | Prototype exports / checkout-savings-nudge › checkout-savings-nudge / sheet-open / v1.2.0 | https://www.figma.com/design/<fileKey>/?node-id=<node-id> |
+   ```
 
-## 5. Return and record the result
+2. Stop the server you started and delete `prototypes/<slug>/.capture/`.
+3. Reply:
 
-Return the exact clickable Figma Design URL supplied by the capture result:
+   ```markdown
+   ## Exported v1.2.0 to Figma
 
-```markdown
-## Figma export complete
+   **File:** <designer's link> · **Page:** Prototype exports / <slug>
 
-**Source:** `prototypes/<slug>-v1.html` (v1.1.0)
-**Figma:** https://www.figma.com/design/<file-key>/...?node-id=...
-**Mode:** Created new draft file | Added capture to existing file
-**Capture:** Entire screen | Selected element/state
+   | State | Frame | Link |
+   | --- | --- | --- |
+   | default | <slug> / default / v1.2.0 | <node URL> |
+   ```
 
-### Notes
-- [Any browser/capture or fidelity caveats]
-```
-
-Append the URL, mode, source version, and date to the companion notes only
-after capture succeeds.
+   Then add caveats, followed by the post-export numbered options from `design-request`.
 
 ## Failure and fallback
 
-- Never claim success without a returned Figma URL.
-- If browser capture fails, preserve the HTML artifact and notes. Report the
-  failed step and leave no export record.
-- Offer the existing fallback: keep reviewing the self-contained HTML through
-  Cursor Canvas/artifact preview or the localhost browser URL, then manually
-  import a screenshot plus the structure/spec summary into Figma.
-- When available and acceptable to the user, clipboard capture or a new draft
-  file is a closer fallback than a manual DOM rebuild.
-- Complex interactions and animations may require separate state captures or
-  manual Figma polish.
+- Never claim success without a returned Figma link. Record only the states
+  that succeeded, and name the ones that failed.
+- On any failure, still stop the server and delete `.capture/`. `index.html`
+  and history stay untouched.
+- Fallback: review in Canvas or the localhost browser, then place screenshots
+  and the States table into Figma by hand.
+- Complex animation needs manual polish in Figma; each state is a still frame.
 
 ## Example prompts
 
-- "Export prototypes/savings-nudge-v1.html to Figma."
-- "Capture prototypes/login-v1.html into Figma file abc123XYZ."
-
-## Related
-
-- Full flow: `design-request` (offers export after iteration)
-- Prior stage: `design-iterate`
-- Figma inspect (research input): `inspect-design`
+- "Approved — export to Figma: https://www.figma.com/design/abc123/Checkout"
+- "Push checkout-savings-nudge to Figma, only the sheet-open state."

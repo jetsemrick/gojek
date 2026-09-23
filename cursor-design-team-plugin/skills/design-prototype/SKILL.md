@@ -1,112 +1,101 @@
 ---
 name: design-prototype
-description: Build a mobile-first, self-contained HTML canvas prototype — Phase 2 of the design request workflow. Load when the user asks to prototype or build HTML.
+description: Build a clickable, self-contained mobile HTML prototype (fixed 390×844 frame, reviewable states) from a starter template into prototypes/<slug>/index.html and preview it in Canvas. Use when a designer says "prototype this", "build it", "mock it up in HTML", "make it clickable", "build the screen from the research", or picks "build the prototype" at a checkpoint, and as the build step inside design-request. Not for a brand-new brief without research (use design-request), changes to an existing prototype (use design-iterate), or exporting to Figma (use design-export-figma).
 ---
 
-# Design prototype (HTML canvas artifact)
+# Design prototype
 
-Run **Phase 2 (Prototype)** — build a self-contained HTML canvas artifact.
+Build one focused screen or flow as a single HTML file in the request folder.
 
-## When to use
+## Output
 
-- Research is complete (or user provides enough inline brief).
-- Phase 2 of `design-request`, or the user asks to prototype/build HTML only.
-- Designer needs an **interactive preview** in Cursor before Figma polish.
+In `prototypes/<slug>/`:
 
-Primary output is a **self-contained HTML file** viewable as a Cursor canvas artifact.
+| File | From |
+| --- | --- |
+| `index.html` | A starter in `templates/` next to this SKILL.md |
+| `notes.md` | `templates/notes.md` next to this SKILL.md |
+| `feedback.md` | `../design-iterate/templates/feedback.md` (header only, no rows) |
+| `history/1.0.0.html` | Copy of `index.html` once it is written |
 
-## Prerequisites
+If `index.html` already exists, stop and use `design-iterate` instead.
 
-1. Load `html-prototype-standards` rule — follow all conventions.
-2. Have research summary or brief with screen name, states, and key copy.
-3. Confirm file output path with user if repo conventions exist; default: `prototypes/<slug>-v1.html`.
+## 1. Pick a starter
 
-## Workflow
+Use the starter named in `research.md`, or the closest match:
 
-### 1. Define prototype scope
+| Starter | Use for | States |
+| --- | --- | --- |
+| `bottom-sheet.html` | Nudges, confirmations, pickers over a screen | `default`, `sheet-open` |
+| `onboarding-step.html` | Multi-step intro, permission priming | `step-1`, `step-2`, `step-3` |
+| `list-detail.html` | Browse and drill in | `list`, `detail` |
+| `form.html` | Sign-in, sign-up, any input with validation | `default`, `error`, `submitting`, `success` |
+| `empty-error.html` | Empty, error, loading, and loaded content | `content`, `empty`, `error`, `loading` |
+| `settings.html` | Grouped rows, toggles, destructive confirm | `default`, `notifications-off`, `sign-out-confirm` |
 
-From research or brief, list:
-- Screen name and primary user action
-- States to include (default, loading, error, empty — only what was requested)
-- Interactive behaviors (tabs, sheet open/close, form validation demo)
+Copy the starter, then adapt it. Rename, add, or remove states to match the
+brief. If nothing fits, copy the closest starter and replace the screen content
+while keeping the frame and scaffold.
 
-Keep MVP prototypes **focused** — one primary screen or flow, not a full app shell unless asked.
+## 2. Keep the scaffold
 
-### 2. Build self-contained HTML
+Every prototype keeps these parts of the starter; export depends on them:
 
-Create a **single `.html` file** with:
-- Inline `<style>` (preferred) or minimal embedded CSS — no external CDN dependencies unless necessary for fonts.
-- Semantic HTML: `header`, `main`, `nav`, `button`, `form`, etc.
-- Mobile viewport meta and 390px-centered frame per `html-prototype-standards`.
-- Safe-area padding using `env(safe-area-inset-*)`.
-- Minimal vanilla JS for interactions (toggle states, open sheet, fake submit).
+- **Fixed frame:** `#device` is 390×844 on desktop and fills the viewport on phones.
+- **States:** `data-states` on `#device` lists every state id in review order.
+  `render(state)` sets the whole screen from the state id alone, so
+  `index.html?state=<id>` always shows the same thing. Interactions call
+  `setState(id, { interactive: true })`.
+- **Capture mode:** `?capture=1` hides the review bar, removes the frame
+  shadow, and disables motion. Do not remove the capture CSS.
+- **Review bar:** the "State" switcher under the frame. It is outside
+  `#device`, hidden on phones and during capture.
+- **Version comment** in `<head>`: prototype name, slug, version, starter,
+  states, changelog line.
 
-Include a version block comment at top of file:
+## 3. Standards
 
-```html
-<!--
-  Prototype: [Screen name]
-  Version: 1.0.0
-  Request: [link or brief ref]
-  Changelog: Initial prototype
--->
-```
+- One file, inline `<style>` and `<script>`, no external scripts, fonts, or
+  network calls. Inline SVG for icons.
+- Semantic elements (`header`, `main`, `button`, `form`, `label`).
+- Touch targets 48px (meets 44pt iOS and 48dp Android); visible `:focus-visible`.
+- Safe areas use `max(env(safe-area-inset-*), <simulated inset>)`, never a sum.
+- Modals and sheets: backdrop fades with opacity (no `hidden`), closed layers
+  are `inert`, the background is `inert` while open, Escape closes, focus
+  moves in on open and returns to the opener on close.
+- Tokens live in `:root`; change values, keep names stable.
+- Label placeholder copy in `notes.md` open questions.
 
-### 3. Create companion notes
+## 4. Write notes and feedback
 
-Write `prototypes/<slug>-notes.md` (or alongside artifact) with:
+- `notes.md`: fill in slug, version `1.0.0`, starter, and the **States** table
+  in the same order as `data-states`. Export captures one frame per row.
+- `feedback.md`: copy the header and legend; rows are added by `design-iterate`.
+- Copy `index.html` to `history/1.0.0.html`.
 
-```markdown
-# [Screen name] — prototype notes
+## 5. Preview: Canvas first
 
-**Artifact:** `prototypes/<slug>-v1.html`
-**Version:** 1.0.0
-**Platform:** Mobile 390px
+1. Show `prototypes/<slug>/index.html` in Cursor's Canvas preview. Tell the
+   designer to use the State bar under the frame to flip states.
+2. If Canvas is unavailable, blank, or blocks the scripts, fall back to a
+   local server rooted at the request folder:
 
-## Changelog
-### 1.0.0 — [date]
-- Initial prototype
+   ```bash
+   npx --yes serve -l <port> prototypes/<slug>
+   # or: python3 -m http.server <port> --directory prototypes/<slug>
+   ```
 
-## Review checklist
-- [ ] Layout matches brief
-- [ ] Touch targets ≥ 44px
-- [ ] Safe areas respected
-- [ ] States documented
-- [ ] Ready for Figma polish
+   Check the port answers (`curl -sI http://localhost:<port>/index.html`), then
+   open `http://localhost:<port>/index.html` in Cursor's browser. States are
+   also reachable as `?state=<id>`.
 
-## Open questions
-- ...
-```
+## 6. Checkpoint
 
-### 4. Present to designer
-
-Tell the designer:
-1. Where the HTML file was written
-2. How to open **Canvas / artifact preview** in Cursor
-3. What interactions are demo-only
-4. Suggested feedback format for the iterate phase (`design-iterate` skill)
-
-## Canvas artifact behavior in Cursor
-
-- Save the HTML file to the workspace; Cursor can preview HTML in the **artifact / canvas** panel.
-- The file must be **self-contained** — designers should not need a dev server.
-- Use relative paths only for assets included in the same folder; prefer inline SVG for icons in MVP.
+End with the numbered options from `design-request`: approve and export (paste
+a Figma file link), change something, add a state.
 
 ## Example prompts
 
-- "Prototype the savings nudge bottom sheet from the research summary."
-- "Build a mobile profile settings prototype — list rows, toggle notifications, 390px."
-- "Build HTML for login: email field, primary CTA, SSO buttons, error state on submit."
-
-## Do not
-
-- Split into multi-file bundles unless user asks (MVP = one HTML file).
-- Use desktop-first layouts or fixed 1200px widths.
-- Ship placeholder lorem without noting it in open questions.
-- Skip version/changelog metadata.
-
-## Related
-
-- Prior phase: `design-research`
-- Next phase: `design-iterate`
-- Full flow: `design-request`
+- "Prototype the savings nudge from the research — bottom sheet, dismissible."
+- "Build a settings screen with a notifications toggle and a sign-out confirm."
+- "Make the login form clickable with an error state."
