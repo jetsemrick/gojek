@@ -1,23 +1,12 @@
 {
-  "name": "goto-savings-nudges-m1",
-  "version": "0.1.0",
+  "name": "goto-private-plugins",
   "private": true,
-  "description": "Path A spike: GoTo Savings Nudges M1 pricing contract and UI-surface stubs (mocks, not production GoFood).",
+  "description": "GoTo private Cursor team marketplace.",
   "type": "module",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "demo": "tsx src/cli.ts",
     "validate:plugin": "node cursor-design-team-plugin/scripts/validate-plugin.mjs"
-  },
-  "devDependencies": {
-    "@types/node": "^24.5.2",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
   }
 }
