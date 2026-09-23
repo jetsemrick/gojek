@@ -34,4 +34,4 @@ npm run validate:plugin
 
 This runs `design/scripts/validate-plugin.mjs`, which checks
 the marketplace and plugin manifests, component names and descriptions, starter
-templates, and stale or forbidden references.
+and research board templates, and stale or forbidden references.

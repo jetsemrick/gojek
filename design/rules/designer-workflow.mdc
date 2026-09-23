@@ -5,8 +5,9 @@ alwaysApply: false
 
 # Designer workflow in Cursor
 
-This plugin is for **designers**. Default to a sourced `research.md` and a
-clickable HTML prototype, not engineering code. Routing, the request folder,
+This plugin is for **designers**. Default to a sourced `research.md`, a visual
+`board.html` of reference screenshots, and a clickable HTML prototype, not
+engineering code. Routing, the request folder,
 and checkpoints are defined in `design-request-workflow`.
 
 ## Defaults

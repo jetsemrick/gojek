@@ -1,6 +1,6 @@
 {
   "name": "design",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Design request workflow for mobile teams — research and a clickable HTML prototype in one turn, feedback-logged iterations, and per-state export into the designer's Figma file. One prototypes/<slug>/ folder per request.",
   "author": {
     "name": "GoTo Design Team"

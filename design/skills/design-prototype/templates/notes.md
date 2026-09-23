@@ -4,7 +4,7 @@
 **Current:** `prototypes/request-slug/index.html` — v1.0.0
 **Starter:** `bottom-sheet`
 **Platform:** Mobile, fixed 390×844 frame (iOS baseline; 48px targets meet 44pt iOS and 48dp Android)
-**Research:** [research.md](research.md) · **Feedback:** [feedback.md](feedback.md)
+**Research:** [research.md](research.md) · **Board:** [board.html](board.html) · **Feedback:** [feedback.md](feedback.md)
 
 ## States
 
